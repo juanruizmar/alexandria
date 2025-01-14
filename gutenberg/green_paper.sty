@@ -1,0 +1,26 @@
+\ProvidesPackage{green_paper}[A green paper aestheticall style]
+
+\RequirePackage{gutenberg}
+
+\setmainfont{Times New Roman}
+
+\definecolor{darkBlue}{HTML}{002060} 
+\definecolor{lightBlue}{HTML}{003090}  
+\definecolor{darkOrange}{HTML}{ff9000} 
+\definecolor{greenPaper}{HTML}{e2e2e2} 
+
+\renewcommand{\codeBackGroundColour}{white}
+\renewcommand{\textBackGroundColour}{greenPaper}
+\renewcommand{\titlesColour}{darkBlue}
+\renewcommand{\mainColour}{darkBlue}
+\renewcommand{\bodyColour}{darkBlue}
+\renewcommand{\secondaryColour}{lightBlue}
+\renewcommand{\pageNumberColour}{darkBlue}
+\renewcommand{\decoratorColour}{darkOrange}
+
+\AtBeginDocument{
+    \pagecolor{\textBackGroundColour}
+    \color{\bodyColour}
+}
+
+\renewcommand{\thepage} { \textcolor{\pageNumberColour}{\arabic{page}} }

@@ -1,0 +1,5 @@
+This library aims to offer some efficient solutions in C++ to frequent problems via data structures and
+generic algorithms not present in the Standard Templates Library.
+
+To know:
+    - rand_generator instances are not thread-safe

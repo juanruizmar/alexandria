@@ -1,0 +1,48 @@
+\ProvidesPackage{gutenberg}[Some commands for LaTeX]
+
+\RequirePackage{hyperref}
+\RequirePackage{geometry}
+\RequirePackage{graphicx}
+\RequirePackage{float}
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage{fontspec}
+
+\providecommand{\codeBackGroundColour}{white}
+\providecommand{\textBackGroundColour}{white}
+\providecommand{\titlesColour}{black}
+\providecommand{\mainColour}{black}
+\providecommand{\bodyColour}{black}
+\providecommand{\secondaryColour}{black}
+\providecommand{\pageNumberColour}{black}
+\providecommand{\decoratorColour}{black}
+
+\newcommand{\insertCode}[1]{
+    \lstinputlisting[
+        numbers=left, 
+        numberstyle=\tiny\color{\secondaryColour},
+        stepnumber=1, 
+        numbersep=5pt,
+        backgroundcolor=\color{\codeBackGroundColour},
+        showspaces=false,
+        showstringspaces=false,
+        showtabs=false,
+        breaklines=true,
+        breakatwhitespace=false,
+        postbreak=\mbox{\textcolor{\secondaryColour}{$\hookrightarrow$}\space},
+        frame=single,
+        basicstyle=\ttfamily,
+        columns=flexible,
+        captionpos=b,
+    ]{#1}
+}
+
+\newcommand{\insertPicture}[1]{
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth, keepaspectratio]{#1}
+    \end{figure}
+}

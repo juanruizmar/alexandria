@@ -1,0 +1,1 @@
+This library should contain functions (maybe, in different languages) for computations about spherical geometry.

@@ -1,0 +1,1 @@
+This package contains some styles for formating LaTeX documents.
