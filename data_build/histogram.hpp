@@ -16,16 +16,16 @@ class histogram{
 
     public:
         template<typename container>
-        histogram(const container &valores): 
+        histogram(const container &values): 
         min_(std::numeric_limits<double>::infinity()), 
         max_(-std::numeric_limits<double>::infinity()), 
-        frequencies_(std::vector<std::size_t>(std::ceil(std::sqrt(static_cast<double>(valores.size()))), 0)){
-            for(auto i: valores){
+        frequencies_(std::vector<std::size_t>(std::ceil(std::sqrt(static_cast<double>(values.size()))), 0)){
+            for(auto i: values){
                 if(i<min_) min_=i;
                 if(i>max_) max_=i;
             }
 
-            for(auto i: valores) ++frequencies_[std::floor((i-min_)/segment_length())];
+            for(auto i: values) ++frequencies_[std::floor((i-min_)/segment_length())];
         }
 
         inline double min() const { return min_; }
