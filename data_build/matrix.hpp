@@ -3,8 +3,6 @@
 
 #include <algorithm>
 
-#include <fstream>
-
 #include <valarray>
 
 #include <cassert>
