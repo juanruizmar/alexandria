@@ -33,7 +33,7 @@ class histogram{
         inline double segment_length() const { return (max_-min_)/n_segments(); }
         inline std::size_t n_segments() const { return frequencies_.size(); }
 
-        inline void print(const std::string &path) { std::ofstream of(path); print(of); }
+        inline void print(const std::string &path) { std::ofstream os(path); print(os); }
         void print(std::ostream &os);
 };
 
