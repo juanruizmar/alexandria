@@ -4,7 +4,6 @@
 #include <cassert>
 
 #include <vector>
-#include <iostream>
 
 class union_find{
     private:
