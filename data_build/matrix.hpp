@@ -34,14 +34,14 @@ template<typename T> class square_matrix_interface: public matrix_interface<T>{
 template<typename T> class matrix: public matrix_interface<T>{
     private:
         std::valarray<T> payload;
-        std::size_t n_rows_;
+        std::size_t n_cols_;
 
     public:
-        inline matrix(std::size_t n_rows, std::size_t n_cols): payload(n_rows*n_cols), n_rows_(n_rows) {}
-        inline matrix(std::size_t n_rows, std::size_t n_cols, const T &default_value): payload(default_value, n_rows*n_cols), n_rows_(n_rows) {}
+        inline matrix(std::size_t n_rows, std::size_t n_cols): payload(n_rows*n_cols), n_cols_(n_cols) {}
+        inline matrix(std::size_t n_rows, std::size_t n_cols, const T &default_value): payload(default_value, n_rows*n_cols), n_cols_(n_cols) {}
 
-        inline std::size_t n_rows() const { return n_rows_; }
-        inline std::size_t n_cols() const { return payload.size()/n_rows_; }
+        inline std::size_t n_rows() const { return payload.size()/n_cols_; }
+        inline std::size_t n_cols() const { return n_cols_; }
 
         inline const T& get(std::size_t i, std::size_t j) const { return payload[i*n_cols()+j]; }
         inline void set(std::size_t i, std::size_t j, const T& value) { payload[i*n_cols()+j]=value; }
