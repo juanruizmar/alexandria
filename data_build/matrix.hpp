@@ -16,6 +16,7 @@ template<typename T> class matrix_interface{
         virtual std::size_t n_cols() const = 0;
         inline std::size_t size() const { return n_rows()*n_cols(); }
 
+        virtual T& get(std::size_t i, std::size_t j) = 0;
         virtual const T& get(std::size_t i, std::size_t j) const = 0;
         virtual void set(std::size_t i, std::size_t j, const T& value) = 0;
 
@@ -43,6 +44,7 @@ template<typename T> class matrix: public matrix_interface<T>{
         inline std::size_t n_rows() const { return payload.size()/n_cols_; }
         inline std::size_t n_cols() const { return n_cols_; }
 
+        inline T& get(std::size_t i, std::size_t j) { return payload[i*n_cols()+j]; }
         inline const T& get(std::size_t i, std::size_t j) const { return payload[i*n_cols()+j]; }
         inline void set(std::size_t i, std::size_t j, const T& value) { payload[i*n_cols()+j]=value; }
 };
@@ -59,6 +61,7 @@ template<typename T> class sq_matrix: public square_matrix_interface<T>{
         inline std::size_t n_cols() const { return range(); }
         inline std::size_t range() const { return range_; }
 
+        inline T& get(std::size_t i, std::size_t j) { return payload[i*range()+j]; }
         inline const T& get(std::size_t i, std::size_t j) const { return payload[i*range()+j]; }
         inline void set(std::size_t i, std::size_t j, const T& value) { payload[i*range()+j]=value; }
 };
@@ -85,6 +88,7 @@ template<typename T> class sym_matrix: public square_matrix_interface<T>{
         inline std::size_t n_cols() const { return range(); }
         inline std::size_t range() const { return payload.n_cols() + payload.n_rows() - payload.n_cols()/2 -1; }
 
+        inline T& get(std::size_t i, std::size_t j) { return i<=j ? internal_get(i,j) : internal_get(j,i); }
         inline const T& get(std::size_t i, std::size_t j) const { return i<=j ? internal_get(i,j) : internal_get(j,i); }
         inline void set(std::size_t i, std::size_t j, const T& value) { i<=j ? internal_set(i,j,value) : internal_set(j,i,value); }
 };
