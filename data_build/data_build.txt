@@ -3,3 +3,6 @@ generic algorithms not present in the Standard Templates Library.
 
 To know:
     - rand_generator instances are not thread-safe
+    - matrix class is made with std::valarray, and cpp reference does not says to specialize that for use with bool.
+    However, as it is expected to improve its behaviour to operate element-by-element, it was done so, instead of with std::vector.
+    At this moment, its main purpose is to perform logical opperations with its <bool> version
