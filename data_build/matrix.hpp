@@ -75,8 +75,8 @@ template<typename T> class sq_matrix: public square_matrix_interface<T>{
         matrix<T> payload;
 
     public:
-        inline sq_matrix(std::size_t range): payload(range,range) {}
-        inline sq_matrix(std::size_t range, const T &default_value): payload(range,range,default_value) {}
+        inline sq_matrix(std::size_t range): payload(range, range) {}
+        inline sq_matrix(std::size_t range, const T &default_value): payload(range, range, default_value) {}
 
         inline std::size_t range() const { return payload.n_cols(); }
 
