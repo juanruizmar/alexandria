@@ -90,14 +90,14 @@ template<typename T> class sym_matrix: public square_matrix_interface<T>{
     private:
         matrix<T> payload;
 
-        inline std::pair<size_t,size_t> translate_ij(size_t i, size_t j) const{
+        inline const std::pair<size_t,size_t> &translate_ij(size_t i, size_t j) const{
             assert(i<=j);
             if(i<payload.n_rows()) return std::make_pair(i, j + payload.n_cols()/2 - payload.n_rows() +1);
             else return std::make_pair(2*payload.n_rows()-i-1, 2*payload.n_rows()-j + payload.n_cols()/2 - payload.n_rows() -1);
         }
 
-        inline T& internal_get(std::pair<size_t,size_t> ij){ return payload.get(ij.first, ij.second); }
-        inline const T& internal_get(std::pair<size_t,size_t> ij) const { return payload.get(ij.first, ij.second); }
+        inline T& internal_get(const std::pair<size_t,size_t> &ij){ return payload.get(ij.first, ij.second); }
+        inline const T& internal_get(const std::pair<size_t,size_t> &ij) const { return payload.get(ij.first, ij.second); }
 
     public:
         inline sym_matrix(std::size_t range): payload(1 + (range-1)/2, range + ((range+1)%2)) {}
