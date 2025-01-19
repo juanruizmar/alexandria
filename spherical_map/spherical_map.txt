@@ -1,1 +1,4 @@
 This library should contain functions (maybe, in different languages) for computations about spherical geometry.
+
+At this moment, some modules were "rescued" from another projects, but the lack of documentation is a serious
+problem here.
