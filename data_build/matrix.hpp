@@ -1,7 +1,7 @@
 #ifndef MATRIX__250118
 #define MATRIX__250118
 
-#include <algorithm>
+#include <utility>
 
 #include <valarray>
 
@@ -20,10 +20,11 @@ template<typename T> class matrix_interface{
         virtual void transpose() = 0;
 
         void display(std::ostream &os) const{
-            for(size_t i=0; i<n_rows(); ++i){
-                for(size_t j=0; j<n_cols(); ++j) os << get(i,j) << " ";
+            for(std::size_t i=0; i<n_rows(); ++i){
+                for(std::size_t j=0; j<n_cols(); ++j) os << get(i,j) << " ";
                 os << std::endl;
             }
+            os << std::endl;
         }
 };
 template<typename T> class square_matrix_interface: public matrix_interface<T>{
@@ -41,7 +42,7 @@ template<typename T> class matrix: public matrix_interface<T>{
             private:
                 std::valarray<T> payload;
                 std::size_t n_cols_;
-
+            
             public:
                 inline matrix_core(std::size_t n_rows, std::size_t n_cols): payload(n_rows*n_cols), n_cols_(n_cols) {}
                 inline matrix_core(std::size_t n_rows, std::size_t n_cols, const T &default_value): payload(default_value, n_rows*n_cols), n_cols_(n_cols) {}
@@ -90,14 +91,14 @@ template<typename T> class sym_matrix: public square_matrix_interface<T>{
     private:
         matrix<T> payload;
 
-        inline const std::pair<size_t,size_t> &translate_ij(size_t i, size_t j) const{
+        inline std::pair<std::size_t,std::size_t> translate_ij(std::size_t i, std::size_t j) const{
             assert(i<=j);
             if(i<payload.n_rows()) return std::make_pair(i, j + payload.n_cols()/2 - payload.n_rows() +1);
             else return std::make_pair(2*payload.n_rows()-i-1, 2*payload.n_rows()-j + payload.n_cols()/2 - payload.n_rows() -1);
         }
 
-        inline T& internal_get(const std::pair<size_t,size_t> &ij){ return payload.get(ij.first, ij.second); }
-        inline const T& internal_get(const std::pair<size_t,size_t> &ij) const { return payload.get(ij.first, ij.second); }
+        inline T& internal_get(const std::pair<std::size_t,std::size_t> &ij){ return payload.get(ij.first, ij.second); }
+        inline const T& internal_get(const std::pair<std::size_t,std::size_t> &ij) const { return payload.get(ij.first, ij.second); }
 
     public:
         inline sym_matrix(std::size_t range): payload(1 + (range-1)/2, range + ((range+1)%2)) {}
@@ -110,6 +111,19 @@ template<typename T> class sym_matrix: public square_matrix_interface<T>{
         inline T& get(std::size_t i, std::size_t j) { return i<=j ? internal_get(translate_ij(i,j)) : internal_get(translate_ij(j,i)); }
         inline const T& get(std::size_t i, std::size_t j) const { return i<=j ? internal_get(translate_ij(i,j)) : internal_get(translate_ij(j,i)); }
         inline void set(std::size_t i, std::size_t j, const T& value) { i<=j ? internal_get(translate_ij(i,j))=value : internal_get(translate_ij(j,i))=value; }
+};
+
+class incorrect_matrix_size: std::exception{
+    private:
+        std::size_t n_rows_got_, n_rows_expected_, n_cols_got_, n_cols_expected_;
+    public:
+        inline incorrect_matrix_size(std::size_t n_rows_got, std::size_t n_rows_expected, std::size_t n_cols_got, std::size_t n_cols_expected):
+        n_rows_got_(n_rows_got), n_rows_expected_(n_rows_expected), n_cols_got_(n_cols_got), n_cols_expected_(n_cols_expected) {}
+
+        inline const char *what() { return ("Incorrect size in operation with matrix: Expected" + 
+            std::to_string(n_rows_expected_) + " x " + std::to_string(n_cols_expected_) + ", but received" +  
+            std::to_string(n_rows_got_) + " x " + std::to_string(n_cols_got_)).c_str(); 
+        }
 };
 
 #endif
