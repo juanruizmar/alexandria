@@ -170,10 +170,7 @@ class incorrect_matrix_size: std::exception{
         }
 };
 
-//template <template<typename> class M, typename T> M<T> operator +(const M<T> &lhs, const M<T> &rhs){
-//    if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return M<T>::add(lhs, rhs);
-//    else throw incorrect_matrix_size(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
-//}
+// PENDIENTE: Optimize that (a template of templates ?): 
 template <typename T> matrix<T> operator +(const matrix<T> &lhs, const matrix<T> &rhs){
     if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return matrix<T>::add(lhs, rhs);
     else throw incorrect_matrix_size(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
