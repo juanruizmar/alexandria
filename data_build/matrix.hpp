@@ -17,6 +17,8 @@ template<typename T> class matrix_interface{
         virtual const T& get(std::size_t i, std::size_t j) const = 0;
         virtual void set(std::size_t i, std::size_t j, const T& value) = 0;
 
+        virtual bool is_square() const { return n_rows()==n_cols(); }
+
         void display(std::ostream &os) const{
             for(std::size_t i=0; i<n_rows(); ++i){
                 for(std::size_t j=0; j<n_cols(); ++j) os << get(i,j) << " ";
@@ -32,6 +34,10 @@ template<typename T> class square_matrix_interface: public matrix_interface<T>{
         inline std::size_t n_rows() const { return range(); }
         inline std::size_t n_cols() const { return range(); }
         virtual std::size_t range() const = 0;
+
+        virtual bool is_square() const { return true; }
+        virtual bool is_symmetric() const = 0;
+
 };
 
 template<typename T> class matrix: public matrix_interface<T>{
@@ -83,6 +89,8 @@ template<typename T> class matrix: public matrix_interface<T>{
         }
 
     public:
+        inline matrix(const matrix<T>&) = default;
+
         inline matrix(std::size_t n_rows, std::size_t n_cols): payload(n_rows, n_cols), is_transposed(false) {}
         inline matrix(std::size_t n_rows, std::size_t n_cols, const T &default_value): payload(n_rows, n_cols, default_value), is_transposed(false) {}
 
@@ -112,9 +120,17 @@ template<typename T> class sq_matrix: public square_matrix_interface<T>{
         inline sq_matrix(std::size_t range): payload(range, range) {}
         inline sq_matrix(std::size_t range, const T &default_value): payload(range, range, default_value) {}
 
+        inline operator matrix<T>() const { return payload; }
+
         inline std::size_t range() const { return payload.n_cols(); }
 
         inline sq_matrix<T> transposed() const { return sq_matrix(payload.transposed()); }
+
+        bool is_symmetric() const{
+            bool res=true;
+            for(std::size_t i=0; i<range() && res; ++i) for(std::size_t j=i+1; j<range() && res; ++j) res = get(i,j)==get(j,i);
+            return res;
+        }
 
         inline T& get(std::size_t i, std::size_t j) { return payload.get(i,j); }
         inline const T& get(std::size_t i, std::size_t j) const { return payload.get(i,j); }
@@ -150,6 +166,8 @@ template<typename T> class sym_matrix: public square_matrix_interface<T>{
 
         inline sym_matrix<T> transposed() const { return *this; }
 
+        inline bool is_symmetric() const { return true; }
+
         inline T& get(std::size_t i, std::size_t j) { return i<=j ? internal_get(translate_ij(i,j)) : internal_get(translate_ij(j,i)); }
         inline const T& get(std::size_t i, std::size_t j) const { return i<=j ? internal_get(translate_ij(i,j)) : internal_get(translate_ij(j,i)); }
         inline void set(std::size_t i, std::size_t j, const T& value) { i<=j ? internal_get(translate_ij(i,j))=value : internal_get(translate_ij(j,i))=value; }
@@ -157,31 +175,55 @@ template<typename T> class sym_matrix: public square_matrix_interface<T>{
         template<typename S> friend sym_matrix<S> operator +(const sym_matrix<S> &, const sym_matrix<S> &);
 };
 
-class incorrect_matrix_size: std::exception{
+class incorrect_matrix_size_add: std::exception{
     private:
-        std::size_t n_rows_got_, n_rows_expected_, n_cols_got_, n_cols_expected_;
+        std::size_t n_rows_lhs_, n_cols_lhs_, n_rows_rhs_, n_cols_rhs_;
     public:
-        inline incorrect_matrix_size(std::size_t n_rows_got, std::size_t n_rows_expected, std::size_t n_cols_got, std::size_t n_cols_expected):
-        n_rows_got_(n_rows_got), n_rows_expected_(n_rows_expected), n_cols_got_(n_cols_got), n_cols_expected_(n_cols_expected) {}
+        inline incorrect_matrix_size_add(std::size_t n_rows_lhs, std::size_t n_cols_lhs, std::size_t n_rows_rhs, std::size_t n_cols_rhs):
+        n_rows_lhs_(n_rows_lhs), n_cols_lhs_(n_cols_lhs), n_rows_rhs_(n_rows_rhs), n_cols_rhs_(n_cols_rhs) {}
 
-        inline const char *what() { return ("Incorrect size in operation with matrix: Expected" + 
-            std::to_string(n_rows_expected_) + " x " + std::to_string(n_cols_expected_) + ", but received" +  
-            std::to_string(n_rows_got_) + " x " + std::to_string(n_cols_got_)).c_str(); 
+        inline const char *what() { return ("Incorrect size in operation with matrix addition: [" + 
+            std::to_string(n_rows_lhs_) + "] x [" + std::to_string(n_cols_lhs_) + "] + [" +  
+            std::to_string(n_rows_rhs_) + "] x [" + std::to_string(n_cols_rhs_) + "]").c_str(); 
+        }
+};
+class incorrect_matrix_size_mul: std::exception{
+    private:
+        std::size_t n_rows_lhs_, n_cols_lhs_, n_rows_rhs_, n_cols_rhs_;
+    public:
+        inline incorrect_matrix_size_mul(std::size_t n_rows_lhs, std::size_t n_cols_lhs, std::size_t n_rows_rhs, std::size_t n_cols_rhs):
+        n_rows_lhs_(n_rows_lhs), n_cols_lhs_(n_cols_lhs), n_rows_rhs_(n_rows_rhs), n_cols_rhs_(n_cols_rhs) {}
+
+        inline const char *what() { return ("Incorrect size in operation with matrix multiplication: [" + 
+            std::to_string(n_rows_lhs_) + "] x [" + std::to_string(n_cols_lhs_) + "] + [" +  
+            std::to_string(n_rows_rhs_) + "] x [" + std::to_string(n_cols_rhs_) + "]").c_str(); 
         }
 };
 
 // PENDIENTE: Optimize that (a template of templates ?): 
 template <typename T> matrix<T> operator +(const matrix<T> &lhs, const matrix<T> &rhs){
     if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return matrix<T>::add(lhs, rhs);
-    else throw incorrect_matrix_size(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
+    else throw incorrect_matrix_size_add(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
 }
 template <typename T> sq_matrix<T> operator +(const sq_matrix<T> &lhs, const sq_matrix<T> &rhs){
     if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return sq_matrix<T>::add(lhs, rhs);
-    else throw incorrect_matrix_size(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
+    else throw incorrect_matrix_size_add(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
 }
 template <typename T> sym_matrix<T> operator +(const sym_matrix<T> &lhs, const sym_matrix<T> &rhs){
     if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return sym_matrix<T>::add(lhs, rhs);
-    else throw incorrect_matrix_size(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
+    else throw incorrect_matrix_size_add(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
 }
+//template <typename T> matrix<T> operator *(const matrix<T> &lhs, const matrix<T> &rhs){
+//    if(rhs.n_rows()==lhs.n_cols()) return matrix<T>::mul(lhs, rhs);
+//    else throw incorrect_matrix_size_mul(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
+//}
+//template <typename T> sq_matrix<T> operator *(const sq_matrix<T> &lhs, const sq_matrix<T> &rhs){
+//    if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return sq_matrix<T>::mul(lhs, rhs);
+//    else throw incorrect_matrix_size_mul(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
+//}
+//template <typename T> sym_matrix<T> operator *(const sym_matrix<T> &lhs, const sym_matrix<T> &rhs){
+//    if(lhs.n_rows()==rhs.n_rows() && lhs.n_cols()==rhs.n_cols()) return sym_matrix<T>::mul(lhs, rhs);
+//    else throw incorrect_matrix_size_mul(lhs.n_rows(), rhs.n_rows(), lhs.n_cols(), rhs.n_cols());
+//}
 
 #endif
