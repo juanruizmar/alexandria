@@ -7,6 +7,8 @@
 
 #include <cassert>
 
+#include <iostream>
+
 #include "rand_generator.hpp"
 
 template<typename T> class matrix_interface{
