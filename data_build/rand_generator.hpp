@@ -58,6 +58,10 @@ class chance_maker: private uniform_generator{
     public:
         inline chance_maker(): uniform_generator(0,1) {}
         bool chance(double prob) const;
+
+        // A riffle. It returns a vector with the number of prizes that each participant got.
+        // The number of tickets is double instead of int, because it is more general.
+        std::vector<std::size_t> deliver_prizes(std::size_t n_prizes, std::vector<double> n_tickets);
 };
 class rand_perm_generator{
     private:
