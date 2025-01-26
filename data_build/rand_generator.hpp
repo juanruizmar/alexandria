@@ -14,7 +14,7 @@ template <typename T> class random_generator{
 
         virtual T get() const = 0;
 
-        template <typename iter> inline void fill(iter begin, iter end) const { for(auto it=begin; it!=end; ++it) *it=get(); }
+        template <typename iter> inline void fill(const iter &begin, const iter &end) const { for(auto it=begin; it!=end; ++it) *it=get(); }
 
         virtual ~random_generator() = default;
 };
