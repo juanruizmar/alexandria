@@ -206,7 +206,7 @@ template<typename T> class matrix: public matrix_interface<T>{
         inline matrix<T> transposed() const { return matrix<T>(payload.deep_copy(), !is_transposed); }
 
         inline T& get(std::size_t i, std::size_t j) { return is_transposed ? payload.get(j,i): payload.get(i,j); }
-        inline const T& get(std::size_t i, std::size_t j) const { return is_transposed ? payload.get(j,i): payload.get(i,j); }
+        inline const T& get(std::size_t i, std::size_t j) const { return is_transposed ? payload.get(j,i) : payload.get(i,j); }
         inline void set(std::size_t i, std::size_t j, const T& value) { (is_transposed ? payload.get(j,i) : payload.get(i,j)) = value; }
         
         template<typename S> friend matrix<S> operator +(const matrix<S> &, const matrix<S> &);
