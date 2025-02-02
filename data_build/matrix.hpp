@@ -48,6 +48,29 @@ template<typename T> class matrix: public matrix_interface<T>{
     private:
         class matrix_core{
             private:
+                class submatrix{
+                    private:
+                        const matrix_core &payload;
+                        std::size_t min_i_, min_j_, max_offset_;
+
+                    public:
+                        inline submatrix(const matrix_core *payload_ptr, std::size_t min_i, std::size_t min_j, std::size_t max_offset): 
+                        payload(*payload_ptr), min_i_(min_i), min_j_(min_j), max_offset_(max_offset) {}
+
+                        inline submatrix top_left() const { return submatrix(&payload, min_i_, min_j_, max_offset_/2); }
+                        inline submatrix top_right() const { return submatrix(&payload, min_i_, min_j_+max_offset_/2, max_offset_/2); }
+                        inline submatrix bottom_left() const { return submatrix(&payload, min_i_+max_offset_/2, min_j_, max_offset_/2); }
+                        inline submatrix bottom_right() const { return submatrix(&payload, min_i_+max_offset_/2, min_j_+max_offset_/2, max_offset_/2); }
+
+                        inline std::size_t range() const { return max_offset_; }
+
+                        inline T get_relative(std::size_t i, std::size_t j) const{
+                            assert(i<max_offset_); 
+                            assert(j<max_offset_); 
+                            return (i+min_i_>payload.n_rows() || j+min_j_>payload.n_cols()) ? 0 : payload.get(min_i_+i, min_j_+j);
+                        }
+                };
+
                 std::valarray<T> payload;
                 std::size_t n_cols_;
 
@@ -60,35 +83,24 @@ template<typename T> class matrix: public matrix_interface<T>{
                 }
                 inline matrix_core deep_copy() const { return *this; }
 
-                inline matrix_core extract(std::size_t i_min, std::size_t i_max, std::size_t j_min, std::size_t j_max) const{
-                    matrix_core res(i_max-i_min, j_max-j_min);
-                    for(std::size_t i=i_min; i<i_max; ++i) for(std::size_t j=j_min; j<j_max; ++j) res.set(i-i_min, j-j_min, get(i,j));
-                    return res;
-                }
                 inline void insert(std::size_t i_min, std::size_t j_min, const matrix_core &M){
                     for(std::size_t i=0; i<M.n_rows(); ++i) for(std::size_t j=0; j<M.n_cols(); ++j) set(i+i_min, j+j_min, M.get(i, j));
                 }
 
-                inline matrix_core amplify_before_strassen() const{
-                    std::size_t range_lower_bound = std::max(n_rows(), n_cols()), range=1;
-                    while(range_lower_bound > range) range*=2;
-
-                    matrix_core res(range, range, 0);
-                    for(std::size_t i=0; i<n_rows(); ++i) for(std::size_t j=0; j<n_cols(); ++j) res.set(i,j,get(i,j));
-
-                    return res;
-                }
                 inline matrix_core reduce_after_strassen(std::size_t n_rows_, std::size_t n_cols_) const{
                     matrix_core res(n_rows_, n_cols_);
                     for(std::size_t i=0; i<n_rows_; ++i) for(std::size_t j=0; j<n_cols_; ++j) res.set(i,j,get(i,j));
                     return res;
                 }
-               
-                inline matrix_core top_left() const { return extract(0, n_rows()/2, 0, n_cols()/2); }
-                inline matrix_core top_right() const { return extract(0, n_rows()/2, n_cols()/2, n_cols()); }
-                inline matrix_core bottom_left() const { return extract(n_rows()/2, n_rows(), 0, n_cols()/2); }
-                inline matrix_core bottom_right() const { return extract(n_rows()/2, n_rows(), n_cols()/2, n_cols()); }
 
+                inline submatrix as_submatrix() const { return as_submatrix(n_cols()); }
+                inline submatrix as_submatrix(std::size_t range) const { return submatrix(this, 0, 0, range); }
+
+                static inline std::size_t min_range_power_of_2(const matrix_core &lhs, const matrix_core &rhs){
+                    std::size_t range_lower_bound = std::max(std::max(lhs.n_rows(), lhs.n_cols()), rhs.n_cols()), range=1;
+                    while(range_lower_bound > range) range*=2;
+                    return range;
+                }
                 static inline matrix_core join(const matrix_core &top_left_, const matrix_core &top_right_, const matrix_core &bottom_left_, const matrix_core &bottom_right_){
                     assert(top_left_.n_rows()==top_right_.n_rows());
                     assert(bottom_left_.n_rows()==bottom_right_.n_rows());
@@ -105,40 +117,53 @@ template<typename T> class matrix: public matrix_interface<T>{
                     return res;
                 }
 
-                static inline matrix_core mul_naive(const matrix_core &lhs, const matrix_core &rhs){
+                static inline matrix_core mul_strassen(const matrix_core &lhs, const matrix_core &rhs){
                     assert(lhs.n_cols()==rhs.n_rows());
-                    matrix_core res(lhs.n_rows(), rhs.n_cols(), 0);
+                    std::size_t range=min_range_power_of_2(lhs, rhs);
+                    return mul_strassen_rec(lhs.as_submatrix(range), rhs.as_submatrix(range), 1).reduce_after_strassen(lhs.n_rows(), rhs.n_cols());
+                }
+                static inline matrix_core mul_naive(const submatrix &lhs, const submatrix &rhs){
+                    assert(lhs.range()==rhs.range());
+                    matrix_core res(lhs.range(), lhs.range(), 0);
 
-                    for(size_t i=0; i<lhs.n_rows(); ++i)
-                        for(size_t j=0; j<rhs.n_cols(); ++j)
-                            for(size_t k=0; k<lhs.n_cols(); ++k)
-                                res.set(i,j, res.get(i,j)+lhs.get(i,k)*rhs.get(k,j));
+                    for(size_t i=0; i<lhs.range(); ++i)
+                        for(size_t j=0; j<rhs.range(); ++j)
+                            for(size_t k=0; k<lhs.range(); ++k)
+                                res.set(i,j, res.get(i,j)+lhs.get_relative(i,k)*rhs.get_relative(k,j));
                             
                     return res;
                 }
-                static inline matrix_core mul_strassen(const matrix_core &lhs, const matrix_core &rhs){
-                    assert(lhs.n_cols()==rhs.n_rows());
-                    return mul_strassen_rec(lhs.amplify_before_strassen(), rhs.amplify_before_strassen(), 1).reduce_after_strassen(lhs.n_rows(), rhs.n_cols());
+                static inline matrix_core add(const submatrix &lhs, const submatrix &rhs){
+                    assert(lhs.range()==rhs.range());
+                    matrix_core res(lhs.range(), lhs.range(), 0);
+                    for(std::size_t i=0; i<lhs.range(); ++i) for(std::size_t j=0; j<rhs.range(); ++j) res.set(i,j,lhs.get_relative(i,j)+rhs.get_relative(i,j));
+                    return res;
                 }
-                static inline matrix_core mul_strassen_rec(const matrix_core &lhs, const matrix_core &rhs, std::size_t naive_threshold){
-                    if(lhs.n_rows()<=naive_threshold) return mul_naive(lhs, rhs);
+                static inline matrix_core sub(const submatrix &lhs, const submatrix &rhs){
+                    assert(lhs.range()==rhs.range());
+                    matrix_core res(lhs.range(), lhs.range(), 0);
+                    for(std::size_t i=0; i<lhs.range(); ++i) for(std::size_t j=0; j<rhs.range(); ++j) res.set(i,j,lhs.get_relative(i,j)-rhs.get_relative(i,j));
+                    return res;
+                }
+                static inline matrix_core mul_strassen_rec(const submatrix &lhs, const submatrix &rhs, std::size_t naive_threshold){
+                    if(lhs.range()<=naive_threshold) return mul_naive(lhs, rhs);
                     else{
-                        const matrix_core L11 = lhs.top_left();
-                        const matrix_core L12 = lhs.top_right();
-                        const matrix_core L21 = lhs.bottom_left();
-                        const matrix_core L22 = lhs.bottom_right();
-                        const matrix_core R11 = rhs.top_left();
-                        const matrix_core R12 = rhs.top_right();
-                        const matrix_core R21 = rhs.bottom_left();
-                        const matrix_core R22 = rhs.bottom_right();
+                        const submatrix L11 = lhs.top_left();
+                        const submatrix L12 = lhs.top_right();
+                        const submatrix L21 = lhs.bottom_left();
+                        const submatrix L22 = lhs.bottom_right();
+                        const submatrix R11 = rhs.top_left();
+                        const submatrix R12 = rhs.top_right();
+                        const submatrix R21 = rhs.bottom_left();
+                        const submatrix R22 = rhs.bottom_right();
 
-                        const matrix_core M1 = mul_strassen_rec(add(L11, L22), add(R11, R22), naive_threshold);
-                        const matrix_core M2 = mul_strassen_rec(add(L21, L22), R11, naive_threshold);
-                        const matrix_core M3 = mul_strassen_rec(L11, sub(R12, R22), naive_threshold);
-                        const matrix_core M4 = mul_strassen_rec(L22, sub(R21, R11), naive_threshold);
-                        const matrix_core M5 = mul_strassen_rec(add(L11, L12), R22, naive_threshold);
-                        const matrix_core M6 = mul_strassen_rec(sub(L21, L11), add(R11, R12), naive_threshold);
-                        const matrix_core M7 = mul_strassen_rec(sub(L12, L22), add(R21, R22), naive_threshold);
+                        const matrix_core M1 = mul_strassen_rec(add(L11, L22).as_submatrix(), add(R11, R22).as_submatrix(), naive_threshold);
+                        const matrix_core M2 = mul_strassen_rec(add(L21, L22).as_submatrix(), R11, naive_threshold);
+                        const matrix_core M3 = mul_strassen_rec(L11, sub(R12, R22).as_submatrix(), naive_threshold);
+                        const matrix_core M4 = mul_strassen_rec(L22, sub(R21, R11).as_submatrix(), naive_threshold);
+                        const matrix_core M5 = mul_strassen_rec(add(L11, L12).as_submatrix(), R22, naive_threshold);
+                        const matrix_core M6 = mul_strassen_rec(sub(L21, L11).as_submatrix(), add(R11, R12).as_submatrix(), naive_threshold);
+                        const matrix_core M7 = mul_strassen_rec(sub(L12, L22).as_submatrix(), add(R21, R22).as_submatrix(), naive_threshold);
                         
                         return join(add(M1, add(M4, sub(M7, M5))), add(M3, M5), add(M2, M4), add(M1, add(M3, sub(M6, M2))));
                     }
@@ -205,7 +230,7 @@ template<typename T> class matrix: public matrix_interface<T>{
 
         inline matrix<T> transposed() const { return matrix<T>(payload.deep_copy(), !is_transposed); }
 
-        inline T& get(std::size_t i, std::size_t j) { return is_transposed ? payload.get(j,i): payload.get(i,j); }
+        inline T& get(std::size_t i, std::size_t j) { return is_transposed ? payload.get(j,i) : payload.get(i,j); }
         inline const T& get(std::size_t i, std::size_t j) const { return is_transposed ? payload.get(j,i) : payload.get(i,j); }
         inline void set(std::size_t i, std::size_t j, const T& value) { (is_transposed ? payload.get(j,i) : payload.get(i,j)) = value; }
         
