@@ -51,23 +51,24 @@ template<typename T> class matrix: public matrix_interface<T>{
                 class submatrix{
                     private:
                         const matrix_core &payload;
-                        std::size_t min_i_, min_j_, max_offset_;
+                        std::size_t i_min_, j_min_, max_offset_;
 
                     public:
-                        inline submatrix(const matrix_core *payload_ptr, std::size_t min_i, std::size_t min_j, std::size_t max_offset): 
-                        payload(*payload_ptr), min_i_(min_i), min_j_(min_j), max_offset_(max_offset) {}
+                        inline submatrix(const matrix_core *payload_ptr, std::size_t i_min, std::size_t j_min, std::size_t max_offset): 
+                        payload(*payload_ptr), i_min_(i_min), j_min_(j_min), max_offset_(max_offset) {}
 
-                        inline submatrix top_left() const { return submatrix(&payload, min_i_, min_j_, max_offset_/2); }
-                        inline submatrix top_right() const { return submatrix(&payload, min_i_, min_j_+max_offset_/2, max_offset_/2); }
-                        inline submatrix bottom_left() const { return submatrix(&payload, min_i_+max_offset_/2, min_j_, max_offset_/2); }
-                        inline submatrix bottom_right() const { return submatrix(&payload, min_i_+max_offset_/2, min_j_+max_offset_/2, max_offset_/2); }
+                        inline submatrix top_left() const { return submatrix(&payload, i_min_, j_min_, max_offset_/2); }
+                        inline submatrix top_right() const { return submatrix(&payload, i_min_, j_min_+max_offset_/2, max_offset_/2); }
+                        inline submatrix bottom_left() const { return submatrix(&payload, i_min_+max_offset_/2, j_min_, max_offset_/2); }
+                        inline submatrix bottom_right() const { return submatrix(&payload, i_min_+max_offset_/2, j_min_+max_offset_/2, max_offset_/2); }
 
                         inline std::size_t range() const { return max_offset_; }
+                        inline bool is_null() const { return i_min_>payload.n_rows() || j_min_>payload.n_cols(); }
 
                         inline T get_relative(std::size_t i, std::size_t j) const{
                             assert(i<max_offset_); 
                             assert(j<max_offset_); 
-                            return (i+min_i_>payload.n_rows() || j+min_j_>payload.n_cols()) ? 0 : payload.get(min_i_+i, min_j_+j);
+                            return (i+i_min_>payload.n_rows() || j+j_min_>payload.n_cols()) ? 0 : payload.get(i_min_+i, j_min_+j);
                         }
                 };
 
@@ -190,7 +191,7 @@ template<typename T> class matrix: public matrix_interface<T>{
                 inline matrix_core(std::size_t n_rows, std::size_t n_cols): payload(n_rows*n_cols), n_cols_(n_cols) {}
                 inline matrix_core(std::size_t n_rows, std::size_t n_cols, const T &default_value): payload(default_value, n_rows*n_cols), n_cols_(n_cols) {}
 
-                inline std::size_t n_rows() const { return payload.size()/n_cols_; }
+                inline std::size_t n_rows() const { return payload.size()==0 ? 0 : payload.size()/n_cols_; }
                 inline std::size_t n_cols() const { return n_cols_; }
 
                 inline T& get(std::size_t i, std::size_t j) { return payload[i*n_cols()+j]; }
