@@ -1,79 +1,41 @@
-#include "morse_sim.h"
-
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <assert.h>
 
-#define TURN_LIGHT_ON digitalWrite(13, HIGH);
-#define TURN_LIGHT_OFF digitalWrite(13, LOW);
+#include "morse.h"
 
-#define IS_A_LETTER(c) ('a'<=c && c<='z')
-#define GET_INDEX_AS_A_LETTER(c) (c-'a')
+int pointLength=400;              // The time for send a point, in milli-seconds
+double tokenSeparatorRatio=0.5;   // How many points between tokens
+double charSeparatorRatio=0.8;    // How many points between chars
+double wordSeparatorRatio=4;      // How many points between words
+double linePointRatio=2.5;        // How many points a line are.
 
-#define IS_A_DIGIT_OR_CLOSE(c) ('&'<=c && c<='9')
-#define GET_INDEX_AS_A_DIGIT_OR_CLOSE(c) (c-'&')
+int lineLength;
+int tokenSeparatorLength;
+int charSeparatorLength;
+int wordSeparatorLength;
 
-#define IS_UPPER_CASE(c) ('A'<=c && c<='Z')
-#define AS_LOWER_CASE(c) (c+='a'-'A')
+void displayPoint() { putchar('.'); }
+void displayLine() { putchar('-'); }
+void displayNewChar() { putchar(' '); }
+void displayNewWord() { putchar('\n'); }
 
-const char *message = "HOLA MUNDO Y 3 TRISTES TIGRES COMEN TRIGO EN UN TRIGAL";
-
-int point_length=400;
-double token_separator_ratio=0.5;   // How many points between tokens
-double char_separator_ratio=0.8;    // How many points between chars
-double word_separator_ratio=4;      // How many points between words
-double line_point_ratio=2.5;        // How many points a line are.
-
-int line_length;
-int token_separator_length;
-int char_separator_length;
-int word_separator_length;
-
-void setup() {
-    pinMode(13, OUTPUT);
-    line_length = (int)(point_length*line_point_ratio);
-    token_separator_length = (int)(point_length*token_separator_ratio);
-    char_separator_length = (int)(point_length*char_separator_ratio);
-    word_separator_length = (int)(point_length*word_separator_ratio);
-}
-
-void printPoint(){
-    putchar('.');
-}
-void printLine(){
-    putchar('-');
-}
-void printNewChar(){
-    putchar(' ');
-    //delay(char_separator_length);
-}
-void printNewWord(){
-    putchar('\n');
-    //delay(word_separator_length);
-}
-void endOfTransmission(){
-    putchar('\n');
-    fflush(stdout);
-    printf(" ## END OF TRANSMISSION ##\n");
-}
-
-unsigned char printMorsebin(unsigned char c){
-    if(c==0) printNewWord();
+void displayMorsebin(unsigned char c){
+    if(c==0) displayNewWord();
     else{
         while(c>1){
-            if(c%2) printLine();
-            else printPoint();
+            if(c%2) displayLine();
+            else displayPoint();
             c>>=1; 
         }
-        printNewChar();
+        displayNewChar();
     }
 }
 
 unsigned char morsebin(unsigned char c){
-    assert(c!='%'); // Procesado a parte (0/0)
-    // Morsebin:
-    //  - Punto: 0, Línea: 1. Se lee de derecha a izquierda, y se añade un 1 al final
-    // El '0' deberá interpretarse como espacio entre palabras
+    assert(c!='%'); // Processed as 0/0
     static unsigned char lowerCaseAlphabet[] = {
         0b110,      // A
         0b10001,    // B
@@ -129,6 +91,7 @@ unsigned char morsebin(unsigned char c){
     else if(IS_A_DIGIT_OR_CLOSE(c)) return digitsAndCloseToDigits[GET_INDEX_AS_A_DIGIT_OR_CLOSE(c)];
     else{
         if(c==' ') return 0;
+        else if(c=='\n') return 0b11010;
         else if(c=='!') return 0b1010110;
         else if(c=='\"') return 0b1010110;
         else if(c=='@') return 0b1010110;
@@ -138,45 +101,85 @@ unsigned char morsebin(unsigned char c){
         else assert(false);
     }
 }
-
-void display_point(){
-    digitalWrite(13, HIGH);
-    delay(point_length);
-    digitalWrite(13, LOW);
-    delay(token_separator_length);
-}
-void display_line(){
-    digitalWrite(13, HIGH);
-    delay(line_length);
-    digitalWrite(13, LOW);
-    delay(token_separator_length);
-}
-void waitForever(){
-    while(true);
-}
-
-void print(unsigned char c){
-    printf("MorseBin: %x, y en ascii %x (%c)\n", morsebin(c), c, c);
-    //printMorsebin(morsebin(c));
-}
-
-void processChar(char c){
-    if(IS_UPPER_CASE(c)) print(AS_LOWER_CASE(c));
-    else if(c=='%'){
-        print('0');
-        print('/');
-        print('0');
+unsigned char morsebinSpecial(unsigned char prefix, unsigned char c){ // With prefix 0xc3 (195) or 0xc2 (194)
+    assert(prefix==194 || prefix==195);
+    if(prefix==194){
+        assert(c==161 || c==191); // ¿ and ¡
+        if(c==161) return morsebin('?');                    // ¿
+        else assert(c==191); return morsebin('!');          // ¡
     }
-    else print(c);
+    else{
+        assert(prefix==195);
+        assert(c!=183); // Division mark (not defined)
+        if(160<=c && c<=165) return morsebin('a');          // à á â ã ä å
+        else if(c==166) return 0b11010;                     // æ
+        else if(c==167) return 0b100101;                    // ç
+        else if(168<=c && c<=171) return morsebin('e');     // è é ê ë
+        else if(172<=c && c<=175) return morsebin('i');     // ì í î ï
+        else if(c==176) return 0b101100;                    // ð
+        else if(c==177) return 0b111011;                    // ñ
+        else if(178<=c && c<=182) return morsebin('o');     // ò ó ô õ ö
+        else if(c==184) return 0b10111;                     // ø
+        else if(185<=c && c<=188) return morsebin('u');     // ù ú û ü
+        else if(c==189 || c==191) return morsebin('y');     // ý ÿ
+        else assert(c==190); return 0b100110;               // þ
+    }
 }
-void processString(const char *c){
-    for(; *c; ++c) processChar(*c);
+
+void displaySpecial(unsigned char prefix, unsigned char c) { displayMorsebin(morsebinSpecial(prefix, c)); }
+void display(unsigned char c) { displayMorsebin(morsebin(c)); }
+
+void processSpecialChar(unsigned char prefix, unsigned char c){
+    if(prefix==195 && c==159){
+        display('s');
+        display('s');
+    }
+    else displaySpecial(prefix, c);
+}
+void processChar(unsigned char c){
+    assert(c!=195); // A reserved char for special symbols
+    if(IS_UPPER_CASE(c)) display(AS_LOWER_CASE(c));
+    else if(c=='%'){
+        display('0');
+        display('/');
+        display('0');
+    }
+    else display(c);
+}
+
+void endOfTransmission() { printf("\n ## END OF TRANSMISSION ##\n"); }
+
+void processString(const char *input_ptr){
+    for(const unsigned char *c=(const unsigned char *)input_ptr; *c; ++c){
+        if(*c==195 || *c==194){
+            processSpecialChar(*c, *(c+1));
+            ++c;
+        }
+        else processChar(*c);
+    }
     endOfTransmission();
 }
 
+void setup(){
+    lineLength = (int)(pointLength*linePointRatio);
+    tokenSeparatorLength = (int)(pointLength*tokenSeparatorRatio);
+    charSeparatorLength = (int)(pointLength*charSeparatorRatio);
+    wordSeparatorLength = (int)(pointLength*wordSeparatorRatio);
+}
 void loop(){
-    //processString("los numeros del 0 al 9 son 0 1 2 3 4 5 6 7 8 & 9");
-    //processString("el 0 % de 100 es 0");
-    processString("!\":=?@");
-    waitForever();
+    processString("En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo\n");
+    processString("los números del 0 al 9 son 0, 1, 2, 3, 4, 5, 6, 7, 8 & 9");
+    processString("el 0 % de 100 es 0");
+}
+
+int main(){
+    printf("=============SETUP============= \n");
+    setup();
+    printf("=============================== \n");
+    while(true){
+        printf("=============LOOP============= \n");
+        loop();
+        printf("====(iterated only once)====== \n");
+        exit(0);
+    }
 }
