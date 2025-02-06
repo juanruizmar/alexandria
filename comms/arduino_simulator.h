@@ -3,8 +3,8 @@
 
 #include "arduino_interface.h"
 
-void displayPoint();
-void displayLine();
+void displayDot();
+void displayDash();
 void displayNewChar();
 void displayNewWord();
 

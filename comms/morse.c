@@ -6,19 +6,8 @@
 
 #include "morse.h"
 
-int pointLength=400;              // The time for send a point, in milli-seconds
-double tokenSeparatorRatio=0.5;   // How many points between tokens
-double charSeparatorRatio=0.8;    // How many points between chars
-double wordSeparatorRatio=4;      // How many points between words
-double linePointRatio=2.5;        // How many points a line are.
-
-int lineLength;
-int tokenSeparatorLength;
-int charSeparatorLength;
-int wordSeparatorLength;
-
-void displayPoint() { putchar('.'); }
-void displayLine() { putchar('-'); }
+void displayDot() { putchar('.'); }
+void displayDash() { putchar('-'); }
 void displayNewChar() { putchar(' '); }
 void displayNewWord() { putchar('\n'); }
 
@@ -26,8 +15,8 @@ void displayMorsebin(unsigned char c){
     if(c==0) displayNewWord();
     else{
         while(c>1){
-            if(c%2) displayLine();
-            else displayPoint();
+            if(c%2) displayDash();
+            else displayDot();
             c>>=1; 
         }
         displayNewChar();
@@ -73,7 +62,7 @@ unsigned char morsebin(unsigned char c){
         0b101010,   // Plus             +
         0b1110011,  // Comma            ,
         0b1100001,  // Hyphen           -
-        0b1101010,  // Point            .
+        0b1101010,  // Dot              .
         0b101001,   // Slash            /
         0b111111,   // 0
         0b111110,   // 1
@@ -90,14 +79,15 @@ unsigned char morsebin(unsigned char c){
     if(IS_A_LETTER(c)) return lowerCaseAlphabet[GET_INDEX_AS_A_LETTER(c)];
     else if(IS_A_DIGIT_OR_CLOSE(c)) return digitsAndCloseToDigits[GET_INDEX_AS_A_DIGIT_OR_CLOSE(c)];
     else{
-        if(c==' ') return 0;
-        else if(c=='\n') return 0b11010;
+        if(c==' ' || c=='\n') return 0;
         else if(c=='!') return 0b1010110;
         else if(c=='\"') return 0b1010110;
         else if(c=='@') return 0b1010110;
         else if(c==':') return 0b1111000;
         else if(c=='=') return 0b110001;
         else if(c=='?') return 0b1001100;
+        else if(c=='>') return 0b101000;    //  Here, and only here, "UNDERSTOOD"
+        else if(c=='$') return 0b1101;      //  Here, and only here, "INVITATION"
         else assert(false);
     }
 }
@@ -140,16 +130,21 @@ void processChar(unsigned char c){
     assert(c!=195); // A reserved char for special symbols
     if(IS_UPPER_CASE(c)) display(AS_LOWER_CASE(c));
     else if(c=='%'){
-        display('0');
-        display('/');
-        display('0');
+        displayMorsebin(morsebin('0'));
+        displayMorsebin(morsebin('/'));
+        displayMorsebin(morsebin('0'));
     }
     else display(c);
 }
 
+void startOfTransmission() { printf("\n ## START OF TRANSMISSION ##\n"); }
 void endOfTransmission() { printf("\n ## END OF TRANSMISSION ##\n"); }
+void displayErrorCode() { for(int i=0; i<8; ++i) displayDot(); displayNewChar(); }  // Not in use, yet
 
 void processString(const char *input_ptr){
+    printf("\nPROCESS STRING: %s", input_ptr);
+
+    startOfTransmission();
     for(const unsigned char *c=(const unsigned char *)input_ptr; *c; ++c){
         if(*c==195 || *c==194){
             processSpecialChar(*c, *(c+1));
@@ -160,16 +155,13 @@ void processString(const char *input_ptr){
     endOfTransmission();
 }
 
-void setup(){
-    lineLength = (int)(pointLength*linePointRatio);
-    tokenSeparatorLength = (int)(pointLength*tokenSeparatorRatio);
-    charSeparatorLength = (int)(pointLength*charSeparatorRatio);
-    wordSeparatorLength = (int)(pointLength*wordSeparatorRatio);
-}
+void setup(){}
+
 void loop(){
     processString("En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo\n");
     processString("los números del 0 al 9 son 0, 1, 2, 3, 4, 5, 6, 7, 8 & 9");
     processString("el 0 % de 100 es 0");
+    processString("There are\nsome\nlinebreaks\nhere");
 }
 
 int main(){

@@ -1,13 +1,8 @@
-int pointLength=400;              // The time for send a point, in milli-seconds
-double tokenSeparatorRatio=0.5;   // How many points between tokens
-double charSeparatorRatio=0.8;    // How many points between chars
-double wordSeparatorRatio=4;      // How many points between words
-double linePointRatio=2.5;        // How many points a line are.
-
-int lineLength;
-int tokenSeparatorLength;
-int charSeparatorLength;
-int wordSeparatorLength;
+int dotLength;                      // The time for send a dot, in milli-seconds
+const int dashPointRatio=3;         // How many dots a dash are.
+const int tokenSeparatorRatio=1;    // How many dots between tokens
+const int charSeparatorRatio=3;     // How many dots between chars
+const int wordSeparatorRatio=7;     // How many dots between words
 
 #define IS_A_LETTER(c) ('a'<=c && c<='z')
 #define GET_INDEX_AS_A_LETTER(c) (c-'a')
@@ -24,15 +19,20 @@ int wordSeparatorLength;
 #define TURN_LIGHT_ON digitalWrite(13, HIGH);
 #define TURN_LIGHT_OFF digitalWrite(13, LOW);
 
-void displayPoint(){
+#define dashLength (dotLength*dashPointRatio)
+#define tokenSeparatorLength (dotLength*tokenSeparatorRatio)
+#define charSeparatorLength (dotLength*charSeparatorRatio)
+#define wordSeparatorLength (dotLength*wordSeparatorRatio)
+
+void displayDot(){
     TURN_LIGHT_ON;
-    delay(pointLength);
+    delay(dotLength);
     TURN_LIGHT_OFF;
     delay(tokenSeparatorLength);
 }
-void displayLine(){
+void displayDash(){
     TURN_LIGHT_ON;
-    delay(lineLength);
+    delay(dashLength);
     TURN_LIGHT_OFF;
     delay(tokenSeparatorLength);
 }
@@ -43,8 +43,8 @@ unsigned char displayMorsebin(unsigned char c){
     if(c==0) displayNewWord();
     else{
         while(c>1){
-            if(c%2) displayLine();
-            else displayPoint();
+            if(c%2) displayDash();
+            else displayDot();
             c>>=1; 
         }
         displayNewChar();
@@ -114,6 +114,8 @@ unsigned char morsebin(unsigned char c){
         else if(c==':') return 0b1111000;
         else if(c=='=') return 0b110001;
         else if(c=='?') return 0b1001100;
+        else if(c=='>') return 0b101000;    //  Here, and only here, "UNDERSTOOD"
+        else if(c=='$') return 0b1101;      //  Here, and only here, "INVITATION"
     }
 }
 unsigned char morsebinSpecial(unsigned char prefix, unsigned char c){ // With prefix 0xc3 (195) or 0xc2 (194)
@@ -157,10 +159,13 @@ void processChar(unsigned char c){
     else display(c);
 }
 
-void endOfTransmission() { displayMorsebin(0b101010); }
+void startOfTransmission() { displayMorsebin(0b110101); }
+void endOfTransmission() { displayMorsebin(0b1101000); }
+void displayErrorCode() { for(int i=0; i<8; ++i) displayDot(); displayNewChar(); }  // Not in use, yet
 
-void processString(const unsigned char *c){
-    for(; *c; ++c){
+void processString(const char *input_ptr){
+    startOfTransmission();
+    for(const unsigned char *c=(const unsigned char *)input_ptr; *c; ++c){
         if(*c==195 || *c==194){
             processSpecialChar(*c, *(c+1));
             ++c;
@@ -172,10 +177,7 @@ void processString(const unsigned char *c){
 
 void setup(){
     pinMode(13, OUTPUT);
-    lineLength = (int)(pointLength*linePointRatio);
-    tokenSeparatorLength = (int)(pointLength*tokenSeparatorRatio);
-    charSeparatorLength = (int)(pointLength*charSeparatorRatio);
-    wordSeparatorLength = (int)(pointLength*wordSeparatorRatio);
+    dotLength = 400;
 }
 void loop(){
     processString("En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo\n");
