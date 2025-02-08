@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "rand_generator.hpp"
+#include <data_build/rand_generator.hpp>
 
 template<typename T> class matrix_interface{
     public:
