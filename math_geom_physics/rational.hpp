@@ -28,6 +28,12 @@ class rational{   // A rational number, in exactly 32 bits
             if(d==0) throw std::invalid_argument("Invalid value for rational. Denominator cannot be zero");
             reduce();
         }
+
+        inline rational(const rational &) = default;
+        inline rational(rational &&) = default;
+
+        inline rational &operator =(const rational &) = default;
+        inline rational &operator =(rational &&) = default;
         
         inline explicit operator float() const { return (float)n/d; }
 
@@ -39,10 +45,20 @@ class rational{   // A rational number, in exactly 32 bits
         inline rational operator *(rational other) const { return rational(n*other.n,d*other.d); }
         inline rational operator /(rational other) const { if(other.is_zero()) throw std::invalid_argument("Cannot divide by zero"); return rational(n*other.d,d*other.n); }
 
+        inline rational &operator +=(rational other) { *this = operator+(other); return *this; }
+        inline rational &operator -=(rational other) { *this = operator-(other); return *this; }
+        inline rational &operator *=(rational other) { *this = operator*(other); return *this; }
+        inline rational &operator /=(rational other) { *this = operator/(other); return *this; }
+
         inline rational operator +(int other) const { return rational(n+other*d,d); }
         inline rational operator -(int other) const { return rational(n-other*d,d); }
         inline rational operator *(int other) const { return rational(n*other,d); }
         inline rational operator /(int other) const { if(other==0) throw std::invalid_argument("Cannot divide by zero"); return rational(n,d*other); }
+
+        inline rational &operator +=(int other) { *this = operator+(other); return *this; }
+        inline rational &operator -=(int other) { *this = operator-(other); return *this; }
+        inline rational &operator *=(int other) { *this = operator*(other); return *this; }
+        inline rational &operator /=(int other) { *this = operator/(other); return *this; }
 
         inline rational operator -() { return rational(-n,d); }
 
