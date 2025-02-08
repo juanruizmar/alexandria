@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include <data_build/rand_generator.hpp>
+#include <alexandria/data_build/rand_generator.hpp>
 
 template<typename T> class matrix_interface{
     public:
