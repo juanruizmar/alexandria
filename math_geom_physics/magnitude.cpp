@@ -1,7 +1,5 @@
 #include "magnitude.hpp"
 
-#include <iostream>
-
 using namespace std;
 
 magnitude magnitude::distance(DISTANCE, "distance", "d", "metter", "m");
@@ -69,13 +67,13 @@ magnitude magnitude::inverse() const{
 }
 
 opperation_defined_name_and_symbol user_defined_name_and_symbol::square() const{
-    return map<user_defined_name_and_symbol, float>{std::pair(*this, 2)};
+    return map<user_defined_name_and_symbol, rational>{std::pair(*this, 2)};
 }
 opperation_defined_name_and_symbol user_defined_name_and_symbol::cube() const{
-    return map<user_defined_name_and_symbol, float>{std::pair(*this, 3)};
+    return map<user_defined_name_and_symbol, rational>{std::pair(*this, 3)};
 }
 opperation_defined_name_and_symbol user_defined_name_and_symbol::inverse() const{
-    return map<user_defined_name_and_symbol, float>{std::pair(*this, -1)};
+    return map<user_defined_name_and_symbol, rational>{std::pair(*this, -1)};
 }
 opperation_defined_name_and_symbol opperation_defined_name_and_symbol::square() const{
     opperation_defined_name_and_symbol res(*this);
@@ -99,7 +97,7 @@ opperation_defined_name_and_symbol name_and_symbol::operator *(const name_and_sy
 opperation_defined_name_and_symbol name_and_symbol::operator /(const name_and_symbol &other) const{
     return opperation_defined_name_and_symbol(as_raw_map(), other.inverse().as_raw_map());
 }
-opperation_defined_name_and_symbol::opperation_defined_name_and_symbol( const std::map<user_defined_name_and_symbol, float> &m1,  const std::map<user_defined_name_and_symbol, float> &m2){
+opperation_defined_name_and_symbol::opperation_defined_name_and_symbol( const std::map<user_defined_name_and_symbol, rational> &m1,  const std::map<user_defined_name_and_symbol, rational> &m2){
     for(const auto &i: m1) map.emplace(i.first, i.second+ (m2.contains(i.first) ? m1.at(i.first) : 0) );
     for(const auto &i: m2) map.emplace(i.first, i.second+ (m1.contains(i.first) ? m2.at(i.first) : 0) );
 }
@@ -108,7 +106,7 @@ inline string opperation_defined_name_and_symbol::name() const{
     string res;
     for(auto i=map.begin(); true;){
         res+=i->first.name();
-        if(i->second!=1) res+="^(" + std::to_string(i->second) + ")";
+        if(i->second!=1) res+="^(" + to_string(i->second) + ")";
         ++i;
         if(i==map.end()) break;
         res+="*";
@@ -119,7 +117,7 @@ inline string opperation_defined_name_and_symbol::symbol() const{
     string res;
     for(auto i=map.begin(); true;){
         res+=i->first.symbol();
-        if(i->second!=1) res+="^(" + std::to_string(i->second) + ")";
+        if(i->second!=1) res+="^(" + to_string(i->second) + ")";
         ++i;
         if(i==map.end()) break;
         res+="*";

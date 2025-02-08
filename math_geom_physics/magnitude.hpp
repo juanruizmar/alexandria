@@ -1,8 +1,6 @@
 #ifndef MAGNITUDE_250206
 #define MAGNITUDE_250206
 
-#include <iostream>
-
 #include <algorithm>
 #include <memory>
 
@@ -17,6 +15,8 @@
 
 #include <cassert>
 
+#include "rational.hpp"
+
 class magnitude;
 class measure_unit;
 class magnitudes_base;
@@ -28,7 +28,7 @@ class named;
 
 class name_and_symbol{
     private:
-        virtual std::map<user_defined_name_and_symbol, float> as_raw_map() const = 0;
+        virtual std::map<user_defined_name_and_symbol, rational> as_raw_map() const = 0;
 
     public:
         virtual std::string name() const = 0;
@@ -48,7 +48,7 @@ class user_defined_name_and_symbol: public name_and_symbol{
         std::string name_;
         std::string symbol_;
 
-        inline std::map<user_defined_name_and_symbol, float> as_raw_map() const { return {std::pair(*this, 1)}; }
+        inline std::map<user_defined_name_and_symbol, rational> as_raw_map() const { return {std::pair(*this, 1)}; }
     
     public:
         inline user_defined_name_and_symbol(const std::string &name, const std::string &symbol): name_(name), symbol_(symbol) {};
@@ -67,14 +67,14 @@ class user_defined_name_and_symbol: public name_and_symbol{
 };
 class opperation_defined_name_and_symbol: public name_and_symbol{
     private:
-        std::map<user_defined_name_and_symbol, float> map;
+        std::map<user_defined_name_and_symbol, rational> map;
 
-        inline float get_exp(const user_defined_name_and_symbol &key) const { return map.contains(key) ? map.at(key) : 0 ; }
-        inline std::map<user_defined_name_and_symbol, float> as_raw_map() const { return map; }
+        inline rational get_exp(const user_defined_name_and_symbol &key) const { return map.contains(key) ? map.at(key) : 0 ; }
+        inline std::map<user_defined_name_and_symbol, rational> as_raw_map() const { return map; }
 
     public:
-        opperation_defined_name_and_symbol(std::map<user_defined_name_and_symbol, float> &&m): map(m) { assert(map.size()==1); }
-        opperation_defined_name_and_symbol(const std::map<user_defined_name_and_symbol, float> &m1, const std::map<user_defined_name_and_symbol, float> &m2);
+        opperation_defined_name_and_symbol(std::map<user_defined_name_and_symbol, rational> &&m): map(m) { assert(map.size()==1); }
+        opperation_defined_name_and_symbol(const std::map<user_defined_name_and_symbol, rational> &m1, const std::map<user_defined_name_and_symbol, rational> &m2);
         
         std::string name() const;
         std::string symbol() const;

@@ -37,8 +37,8 @@ class rational{   // A rational number, in exactly 32 bits
         
         inline explicit operator float() const { return (float)n/d; }
 
-        inline bool operator ==(rational other) { return n*other.d==other.n*d; }
-        inline bool operator <(rational other) { return n*other.d<other.n*d; }
+        inline bool operator ==(rational other) const { return n*other.d==other.n*d; }
+        inline bool operator <(rational other) const { return n*other.d<other.n*d; }
 
         inline rational operator +(rational other) const { return rational(n*other.d+other.n*d,d*other.d); }
         inline rational operator -(rational other) const { return rational(n*other.d-other.n*d,d*other.d); }
@@ -49,6 +49,9 @@ class rational{   // A rational number, in exactly 32 bits
         inline rational &operator -=(rational other) { *this = operator-(other); return *this; }
         inline rational &operator *=(rational other) { *this = operator*(other); return *this; }
         inline rational &operator /=(rational other) { *this = operator/(other); return *this; }
+
+        inline bool operator ==(int other) const { return operator ==(rational(other)); }
+        inline bool operator <(int other) const { return operator <(rational(other)); }
 
         inline rational operator +(int other) const { return rational(n+other*d,d); }
         inline rational operator -(int other) const { return rational(n-other*d,d); }
@@ -62,16 +65,22 @@ class rational{   // A rational number, in exactly 32 bits
 
         inline rational operator -() { return rational(-n,d); }
 
-        inline friend std::ostream &operator <<(std::ostream &os, rational q){
-            os << q.n;
-            if(!q.is_integer()) os << "/" << q.d;
-            return os;
+        inline std::string to_string() const{
+            if(is_integer()) return std::to_string(n);
+            else return std::to_string(n) + "/" + std::to_string(d);
         }
+
+        inline friend std::ostream &operator <<(std::ostream &os, rational q) { return os << q.to_string(); }
 };
+
+inline bool operator ==(int z, rational q) { return q==z; }
+inline bool operator <(int z, rational q) { return q<z; }
 
 inline rational operator +(int z, rational q) { return rational(z)+q; }
 inline rational operator -(int z, rational q) { return rational(z)-q; }
 inline rational operator *(int z, rational q) { return rational(z)*q; }
 inline rational operator /(int z, rational q) { return rational(z)/q; }
+
+inline std::string to_string(rational q) { return q.to_string(); }
 
 #endif
