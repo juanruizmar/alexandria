@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <fstream>
 
+#include <cassert>
+
 class rational{   // A rational number, in exactly 32 bits
     private:
         short n;
@@ -22,6 +24,7 @@ class rational{   // A rational number, in exactly 32 bits
         
     public:
         inline rational(short _n=0, short _d=1): n(_d>0 ? _n : -_n), d(_d>0 ? _d : -_d){
+            assert(sizeof(rational)==32/8);
             if(d==0) throw std::invalid_argument("Invalid value for rational. Denominator cannot be zero");
             reduce();
         }
@@ -44,9 +47,9 @@ class rational{   // A rational number, in exactly 32 bits
         inline rational operator -() { return rational(-n,d); }
 
         inline friend std::ostream &operator <<(std::ostream &os, rational q){
-            if(q.is_zero()) return os << "0";
-            else if(q.is_integer()) return os << q.n;
-            else return os << q.n << "/" << q.d;
+            os << q.n;
+            if(!q.is_integer()) os << "/" << q.d;
+            return os;
         }
 };
 
