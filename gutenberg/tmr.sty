@@ -1,0 +1,12 @@
+\ProvidesPackage{tmr}[A default black foreground over white background]
+
+\RequirePackage{gutenberg}
+
+\setmainfont{Times New Roman}
+
+\AtBeginDocument{
+    \pagecolor{\textBackGroundColour}
+    \color{\bodyColour}
+}
+
+\renewcommand{\thepage} { \textcolor{\pageNumberColour}{\arabic{page}} }
