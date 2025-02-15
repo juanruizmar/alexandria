@@ -210,6 +210,7 @@ class units_system{
         inline void set_as_default(const measuring_unit *u) { default_units[u->measures_] = u; }
 
         std::string get(const variable &v){
+            // At this moment, it only accepts basic units (metter, second, etc.)
             return std::to_string(v.unit->international_system_equivalence*v.value) + " " + default_units[&v.unit->measures()]->symbol();
         }
 
