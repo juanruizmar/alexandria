@@ -10,7 +10,7 @@ template <typename T> class random_generator{
         mutable std::mt19937 generator;
 
     public:
-        inline random_generator(std::size_t seed = std::random_device{}()): generator(seed) {}
+        inline random_generator(std::size_t seed): generator(seed) {}
 
         virtual T get() const = 0;
 
@@ -48,7 +48,7 @@ class rand_int_generator: public random_generator<std::size_t>{
         mutable std::uniform_int_distribution<std::size_t> distribution;
 
     public:
-        inline rand_int_generator(std::size_t seed = std::random_device{}()): distribution(0, generator.max()) {}
+        inline rand_int_generator(std::size_t seed = std::random_device{}()): random_generator<std::size_t>(seed), distribution(0, generator.max()) {}
 
         inline std::size_t get() const { return distribution(generator); }
         std::size_t get(std::size_t max) const;

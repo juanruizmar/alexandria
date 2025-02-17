@@ -7,7 +7,7 @@ class date_month_only{
     private:
         unsigned int abs_month;    // Months after january 0 A.D
 
-        static const char month_length(unsigned int i) { static const char month_length[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; return month_length[i-1]; }
+        static char month_length(unsigned int i) { static const char month_length[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}; return month_length[i-1]; }
 
     public:
         inline date_month_only(unsigned int year, unsigned int month) noexcept: abs_month(year*12 + month-1){
@@ -50,9 +50,9 @@ class clock_time{
 
     public:
         inline clock_time(unsigned int time, unsigned int minute, unsigned int second) noexcept: abs_seconds(time*3600 + minute*60 + second){
-            assert(0 <= time); assert(time <= 23);
-            assert(0 <= minute); assert(minute <= 59);
-            assert(0 <= second); assert(second <= 59);
+            assert(time <= 23);
+            assert(minute <= 59);
+            assert(second <= 59);
         }
         inline unsigned int time() const { return abs_seconds / 3600; }
         inline unsigned int minute() const { return (abs_seconds % 3600) / 60; }

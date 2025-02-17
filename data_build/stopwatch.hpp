@@ -11,7 +11,7 @@ class stopwatch{
         bool running;
     
     public:
-        inline stopwatch(): running(false), totalDuration(std::chrono::duration<double>::zero()) {}
+        inline stopwatch(): totalDuration(std::chrono::duration<double>::zero()), running(false) {}
     
         inline void start(){
             assert(!running);
