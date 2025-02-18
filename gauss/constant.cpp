@@ -8,7 +8,7 @@ constant constant::phi(std::numbers::phi);
 
 constant constant::gravitation(6.67430e-11);
 constant constant::light_velocity(299792458);
-constant constant::elemental_charge(1.602176634e-19);
+constant constant::elementary_charge(1.602176634e-19);
 
 constant constant::avogadro(6.02214076e23);
 constant constant::boltzmann(1.380649e-23);

@@ -10,7 +10,7 @@ class constant{
 
     public:
         static constant pi, euler, phi;
-        static constant gravitation, light_velocity, elemental_charge;
+        static constant gravitation, light_velocity, elementary_charge;
         static constant avogadro, boltzmann, planck, rydberg;
         static constant electron_mass, proton_mass, neutron_mass;
 
