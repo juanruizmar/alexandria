@@ -10,9 +10,9 @@ class constant{
 
     public:
         static constant pi, euler, phi;
-        static constant gravitation, light_velocity, elementary_charge;
+        static constant gravitation, lightVelocity, elementaryCharge;
         static constant avogadro, boltzmann, planck, rydberg;
-        static constant electron_mass, proton_mass, neutron_mass;
+        static constant electronMass, protonMass, neutronMass;
 
         inline constant(const constant &other) = default;
 

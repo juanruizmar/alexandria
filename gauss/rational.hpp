@@ -35,7 +35,7 @@ class rational{   // A rational number, in exactly 32 bits
         inline rational &operator =(const rational &) = default;
         inline rational &operator =(rational &&) = default;
         
-        inline explicit operator float() const { return (float)n/d; }
+        inline explicit operator double() const { return (double)n/d; }
 
         inline bool operator ==(rational other) const { return n*other.d==other.n*d; }
         inline bool operator <(rational other) const { return n*other.d<other.n*d; }
