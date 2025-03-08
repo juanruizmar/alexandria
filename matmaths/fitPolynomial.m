@@ -3,7 +3,7 @@
 
 % NEVER TESTED
 
-function [coefs, R_sqr] = fit_polynomial(x, y, degree)
+function [coefs, R_sqr] = fitPolynomial(x, y, degree)
     fprintf("PAY ATTENTION! function [coefs, R_sqr] = fit_polynomial(x, y, degree) is now being used by the first time");
 
     coefs=polyfit(x,y,degree);

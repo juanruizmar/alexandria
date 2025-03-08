@@ -1,1 +1,0 @@
-This library should contain statistical functions for MatLab.

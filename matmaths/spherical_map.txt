@@ -1,0 +1,5 @@
+This library should contain functions (maybe, in different languages, but matLab the main one)
+for computations about different mathematical topics (statistics, algebra, spherical geometry, etc.).
+
+At this moment, some modules were "rescued" from another projects, 
+and the lack of documentation is a problem here.
