@@ -14,7 +14,7 @@ template<unsigned n_dimensions> class spacial_vector{
         double module() const { double res=0; for(unsigned i=0; i<n_dimensions; ++i) res+=(pow(components[i], 2)); return std::sqrt(res); }
 
     public:
-        inline spacial_vector() { components.fill(0); }
+        inline spacial_vector() { for(unsigned int i=0; i<n_dimensions; ++i) components[i]=0; }
         
         inline spacial_vector(const std::initializer_list<double> &coords) { std::copy(coords.begin(), coords.end(), components); }
 
@@ -25,7 +25,6 @@ template<unsigned n_dimensions> class spacial_vector{
 
 template<unsigned int n_dimensions> class displacement: public spacial_vector<n_dimensions>{
     public:
-    
         inline double module() const { return spacial_vector<n_dimensions>::module(); }
 };
 template<unsigned int n_dimensions> class point: public spacial_vector<n_dimensions>{
