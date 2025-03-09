@@ -83,4 +83,7 @@ inline rational operator /(int z, rational q) { return rational(z)/q; }
 
 inline std::string to_string(rational q) { return q.to_string(); }
 
+inline rational abs(rational q) { return q<0 ? -q : q; }
+inline double pow(double base, rational exp) { return std::pow(base, (double)exp); }
+
 #endif
