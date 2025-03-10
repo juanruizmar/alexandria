@@ -1,176 +1,140 @@
 #include "magnitude.hpp"
 
+#include <numbers>
+
 using namespace std;
 
-magnitude magnitude::distance(DISTANCE, "distance", "d");
-magnitude magnitude::mass(MASS, "mass", "m");
-magnitude magnitude::time(TIME, "time", "t");
-magnitude magnitude::current(CURRENT, "current", "I");
-magnitude magnitude::temperature(TEMPERATURE, "temperature", "T");
-magnitude magnitude::substanceAmount(SUBSTANCE_AMOUNT, "amount of substance", "n");
-magnitude magnitude::luminosity(LUMINOSITY, "luminosity", "I_V");
-magnitude magnitude::angle(ANGLE, "rotation", "theta");
+value::magnitude value::magnitude::units;
 
-magnitude magnitude::area(distance.square(), "area", "A");
-magnitude magnitude::volume(distance.cube(), "volume", "V");
-magnitude magnitude::frequency(time.inverse(), "frequency", "f");
-magnitude magnitude::velocity(distance/time, "velocity", "v");
-magnitude magnitude::acceleration(velocity/time, "acceleration", "a");
-magnitude magnitude::solidAngle(angle.square(), "rotation", "theta");
-magnitude magnitude::angularVelocity(angle/time, "angular velocity", "omega");
-magnitude magnitude::density(mass/volume, "density", "rho");
-magnitude magnitude::force(mass*acceleration, "force", "F");
-magnitude magnitude::pressure(force/area, "pressure", "P");
-magnitude magnitude::energy(force*distance, "energy", "E");
-magnitude magnitude::power(energy/time, "power", "P");
-magnitude magnitude::momentum(mass*velocity, "momentum", "p");
-magnitude magnitude::charge(current*time, "charge", "q");
-magnitude magnitude::entropy(energy/temperature, "entropy", "S");
-magnitude magnitude::voltage(energy/charge, "voltage", "V");
-magnitude magnitude::resistance(voltage/current, "resistance", "R");
-magnitude magnitude::conductance(resistance.inverse(), "conductance", "G");
-magnitude magnitude::capacitance(charge/voltage, "capacitance", "C");
-magnitude magnitude::impedance(resistance, "impedance", "Z");
-magnitude magnitude::illuminance(luminosity/angularVelocity.square(), "illuminance", "E_V");
-magnitude magnitude::dose(energy/mass, "dose", "D");
-magnitude magnitude::catalyticActivity(substanceAmount/time, "catalytic activity", "cat. act.");
+value::magnitude value::magnitude::distance(DISTANCE);
+value::magnitude value::magnitude::mass(MASS);
+value::magnitude value::magnitude::time(TIME);
+value::magnitude value::magnitude::current(CURRENT);
+value::magnitude value::magnitude::temperature(TEMPERATURE);
+value::magnitude value::magnitude::substanceAmount(SUBSTANCE_AMOUNT);
+value::magnitude value::magnitude::luminosity(LUMINOSITY);
+value::magnitude value::magnitude::angle(ANGLE);
 
-magnitude magnitude::electricField(force/charge, "electric field", "boldE");
-magnitude magnitude::magneticField(electricField/velocity, "magnetic field", "boldB");
-magnitude magnitude::electricFlux(electricField*area, "electric flux", "Phi_E");
-magnitude magnitude::magneticFlux(magneticField*area, "magnetic flux", "Phi_B");
-magnitude magnitude::luminousFlux(luminosity/solidAngle, "lluminous flux", "Phi_V");
+value::magnitude value::magnitude::area(distance.square());
+value::magnitude value::magnitude::volume(distance.cube());
+value::magnitude value::magnitude::frequency(time.inverse());
+value::magnitude value::magnitude::velocity(distance/time);
+value::magnitude value::magnitude::acceleration(velocity/time);
+value::magnitude value::magnitude::solidAngle(angle.square());
+value::magnitude value::magnitude::angularVelocity(angle/time);
+value::magnitude value::magnitude::density(mass/volume);
+value::magnitude value::magnitude::force(mass*acceleration);
+value::magnitude value::magnitude::pressure(force/area);
+value::magnitude value::magnitude::energy(force*distance);
+value::magnitude value::magnitude::power(energy/time);
+value::magnitude value::magnitude::action(energy*time);
+value::magnitude value::magnitude::momentum(mass*velocity);
+value::magnitude value::magnitude::charge(current*time);
+value::magnitude value::magnitude::entropy(energy/temperature);
+value::magnitude value::magnitude::voltage(energy/charge);
+value::magnitude value::magnitude::resistance(voltage/current);
+value::magnitude value::magnitude::conductance(resistance.inverse());
+value::magnitude value::magnitude::capacitance(charge/voltage);
+value::magnitude value::magnitude::impedance(resistance);
+value::magnitude value::magnitude::illuminance(luminosity/angularVelocity.square());
+value::magnitude value::magnitude::dose(energy/mass);
+value::magnitude value::magnitude::catalyticActivity(substanceAmount/time);
+value::magnitude value::magnitude::permitivity(capacitance/distance);
+value::magnitude value::magnitude::permeability(force/current.square());
+value::magnitude value::magnitude::electricField(force/charge);
+value::magnitude value::magnitude::magneticField(electricField/velocity);
+value::magnitude value::magnitude::electricFlux(electricField*area);
+value::magnitude value::magnitude::magneticFlux(magneticField*area);
+value::magnitude value::magnitude::luminousFlux(luminosity/solidAngle);
+value::magnitude value::magnitude::inductance(magneticFlux/current);
 
-magnitude magnitude::inductance(magneticFlux/current, "inductance", "L");   // Defined after magneticFlux
+value::constant value::constant::pi(std::numbers::pi);
+value::constant value::constant::euler(std::numbers::e);
+value::constant value::constant::phi(std::numbers::phi);
 
-measuring_unit measuring_unit::metter(magnitude::distance, "metter", "m");
-measuring_unit measuring_unit::kilogram(magnitude::mass, "kilogram", "Kg");
+value::constant value::constant::gravitation(6.67430e-11);
+value::constant value::constant::lightVelocity(299792458);
+value::constant value::constant::elementaryCharge(1.602176634e-19);
 
-measuring_unit measuring_unit::second(magnitude::time, "second", "s");
-measuring_unit measuring_unit::ampere(magnitude::current, "ampere", "A");
-measuring_unit measuring_unit::kelvin(magnitude::temperature, "kelvin", "K");
-measuring_unit measuring_unit::mol(magnitude::substanceAmount, "mol", "mol");
-measuring_unit measuring_unit::candela(magnitude::luminosity, "candela", "cd");
-measuring_unit measuring_unit::radian(magnitude::angle, "radian", "rad");
+value::constant value::constant::avogadro(6.02214076e23);
+value::constant value::constant::boltzmann(1.380649e-23);
+value::constant value::constant::planck(6.62607015e-34);
+value::constant value::constant::rydberg(10973731.568157);
 
-measuring_unit measuring_unit::steradian(magnitude::solidAngle, "steradian", "sr");
-measuring_unit measuring_unit::herz(magnitude::frequency, "herz", "Hz"); 
-measuring_unit measuring_unit::newton(magnitude::force, "newton", "N");
-measuring_unit measuring_unit::pascal(magnitude::pressure, "pascal", "Pa");
-measuring_unit measuring_unit::joule(magnitude::energy, "joule", "J");
-measuring_unit measuring_unit::watt(magnitude::power, "watt", "W");
-//measuring_unit measuring_unit::celsius(magnitude::temperature);   // Difficult conversion (not implemented yet)
-measuring_unit measuring_unit::becquerel(magnitude::frequency, "becquerel", "Bq");
-measuring_unit measuring_unit::coulomb(magnitude::charge, "coulomb", "C"); 
-measuring_unit measuring_unit::volt(magnitude::voltage, "volt", "V"); 
-measuring_unit measuring_unit::ohm(magnitude::resistance, "ohm", "Omega"); 
-measuring_unit measuring_unit::siemens(magnitude::conductance, "siemens", "S"); 
-measuring_unit measuring_unit::henry(magnitude::inductance, "henry", "H"); 
-measuring_unit measuring_unit::farad(magnitude::capacitance, "farad", "F");
-measuring_unit measuring_unit::gray(magnitude::dose, "gray", "Gy"); 
-measuring_unit measuring_unit::katal(magnitude::catalyticActivity, "katal", "kat"); 
-measuring_unit measuring_unit::lumen(magnitude::luminousFlux, "lumen", "lm"); 
-measuring_unit measuring_unit::lux(magnitude::illuminance, "lux", "lx");
-measuring_unit measuring_unit::tesla(magnitude::magneticFlux, "tesla", "T"); 
-measuring_unit measuring_unit::weber(magnitude::magneticField, "weber", "Wb");
+value::constant value::constant::electronMass(9.1093837139e-31);
+value::constant value::constant::protonMass(1.67262192595e-27);
+value::constant value::constant::neutronMass(1.67492750056e-27);
+value::constant value::constant::atomicMassConstant(1.66053906892e-27);
 
-units_system units_system::international_system({
-    measuring_unit::metter,
-    measuring_unit::kilogram,
-    measuring_unit::second,
-    measuring_unit::ampere,
-    measuring_unit::kelvin,
-    measuring_unit::mol,
-    measuring_unit::candela,
-    measuring_unit::radian
-});
+value value::pi(constant::pi/magnitude::angle);
+value value::euler(constant::euler);
+value value::phi(constant::phi);
+value value::electronMass(constant::electronMass*magnitude::mass);
+value value::protonMass(constant::protonMass*magnitude::mass);
+value value::neutronMass(constant::neutronMass*magnitude::mass);
+value value::gravitationConstant(constant::gravitation*magnitude::force*magnitude::area/magnitude::mass.square());
+value value::lightVelocity(constant::lightVelocity*magnitude::velocity);
+value value::elementaryCharge(constant::elementaryCharge*magnitude::charge);
+value value::avogadroConstant(constant::avogadro/magnitude::substanceAmount);
+value value::boltzmannConstant(constant::boltzmann*magnitude::energy/magnitude::temperature);
+value value::molarGasConstant(boltzmannConstant*avogadroConstant);
+value value::planckConstant(constant::planck*magnitude::action);
+value value::planckBarConstant(planckConstant/(2*pi));
+value value::stephanBoltzmannConstant((pi.square()/60)*pow(boltzmannConstant,4)/(pow(planckBarConstant,3)*pow(lightVelocity,2)));
+value value::atomicMassConstant(constant::atomicMassConstant*magnitude::mass);
+value value::vacuumPermeability(4*constant::pi*1e-7*magnitude::force/magnitude::current.square());
+value value::vacuumPermitivity((vacuumPermeability*pow(lightVelocity,2)).inverse());
+value value::coulombConstant((4*pi*vacuumPermitivity*magnitude::angle).inverse());
+value value::bohrMagneton(elementaryCharge*planckBarConstant/(2*electronMass));
+value value::nuclearMagneton(elementaryCharge*planckBarConstant/(2*protonMass));
+value value::magneticFluxQuantum(planckConstant/(2*elementaryCharge));
+value value::rydbergConstant(constant::rydberg*magnitude::distance.inverse());
+value value::josephsonConstant(magneticFluxQuantum.inverse());
+value value::comptonWaveLength(planckConstant/(electronMass*lightVelocity));
 
-void measuring_unit::record() { measures_->record_unit(this); }
-void measuring_unit::unrecord() { measures_->unrecord_unit(this); }
+value value::metter(1*value::magnitude::distance);
+value value::kilogram(1*value::magnitude::mass);
+value value::second(1*value::magnitude::time);
+value value::ampere(1*value::magnitude::current);
+value value::kelvin(1*value::magnitude::temperature);
+value value::mole(1*value::magnitude::substanceAmount);
+value value::candela(1*value::magnitude::luminosity);
+value value::radian(1*value::magnitude::angle);
 
-magnitude magnitude::operator *(const magnitude &other) const{
-    magnitude res(payload()*other.payload());
+value::magnitude value::magnitude::operator *(const value::magnitude &other) const{
+    value::magnitude res;
     transform(exponents.begin(), exponents.end(),  other.exponents.begin(), res.exponents.begin(), [](rational a, rational b) { return a+b; });
     return res;
 }
-magnitude magnitude::operator /(const magnitude &other) const{
-    magnitude res(payload()/other.payload());
+value::magnitude value::magnitude::operator /(const value::magnitude &other) const{
+    value::magnitude res;
     transform(exponents.begin(), exponents.end(),  other.exponents.begin(), res.exponents.begin(), [](rational a, rational b) { return a-b; });
     return res;
 }
 
-magnitude magnitude::square() const{
-    magnitude res(payload().square());
+value::magnitude value::magnitude::square() const{
+    value::magnitude res;
     transform(exponents.begin(), exponents.end(), res.exponents.begin(), [](rational n) { return n*2; });
     return res;
 }
-magnitude magnitude::cube() const{
-    magnitude res(payload().cube());
+value::magnitude value::magnitude::sq_root() const{
+    value::magnitude res;
+    transform(exponents.begin(), exponents.end(), res.exponents.begin(), [](rational n) { return n/2; });
+    return res;
+}
+value::magnitude value::magnitude::cube() const{
+    value::magnitude res;
     transform(exponents.begin(), exponents.end(), res.exponents.begin(), [](rational n) { return n*3; });
     return res;
 }
-magnitude magnitude::inverse() const{
-    magnitude res(payload().inverse());
+value::magnitude value::magnitude::inverse() const{
+    value::magnitude res;
     transform(exponents.begin(), exponents.end(), res.exponents.begin(), [](rational n) { return -n; });
     return res;
 }
 
-named::opperation_defined_name_and_symbol named::user_defined_name_and_symbol::square() const{
-    return map<user_defined_name_and_symbol, rational>{std::pair(*this, 2)};
-}
-named::opperation_defined_name_and_symbol named::user_defined_name_and_symbol::cube() const{
-    return map<user_defined_name_and_symbol, rational>{std::pair(*this, 3)};
-}
-named::opperation_defined_name_and_symbol named::user_defined_name_and_symbol::inverse() const{
-    return map<user_defined_name_and_symbol, rational>{std::pair(*this, -1)};
-}
-
-named::opperation_defined_name_and_symbol named::opperation_defined_name_and_symbol::square() const{
-    opperation_defined_name_and_symbol res(*this);
-    for(auto &i: res.map) i.second*=2;
-    return res;
-}
-named::opperation_defined_name_and_symbol named::opperation_defined_name_and_symbol::cube() const{
-    opperation_defined_name_and_symbol res(*this);
-    for(auto &i: res.map) i.second*=3;
-    return res;
-}
-named::opperation_defined_name_and_symbol named::opperation_defined_name_and_symbol::inverse() const{
-    opperation_defined_name_and_symbol res(*this);
-    for(auto &i: res.map) i.second*=-1;
-    return res;
-}
-
-named::opperation_defined_name_and_symbol named::name_and_symbol::operator *(const name_and_symbol &other) const{
-    return opperation_defined_name_and_symbol(as_raw_map(), other.as_raw_map());
-}
-named::opperation_defined_name_and_symbol named::name_and_symbol::operator /(const name_and_symbol &other) const{
-    return opperation_defined_name_and_symbol(as_raw_map(), other.inverse().as_raw_map());
-}
-named::opperation_defined_name_and_symbol::opperation_defined_name_and_symbol( const std::map<user_defined_name_and_symbol, rational> &m1,  const std::map<user_defined_name_and_symbol, rational> &m2){
-    for(const auto &i: m1) map.emplace(i.first, i.second + (m2.contains(i.first) ? m1.at(i.first) : 0) );
-    for(const auto &i: m2) map.emplace(i.first, i.second + (m1.contains(i.first) ? m2.at(i.first) : 0) );
-}
-
-string named::opperation_defined_name_and_symbol::name() const{
-    string res;
-    for(auto i=map.begin(); true;){
-        res+=i->first.name();
-        if(i->second!=1) res+="^(" + to_string(i->second) + ")";
-        ++i;
-        if(i==map.end()) break;
-        res+="*";
-    }
-    return res;
-}
-string named::opperation_defined_name_and_symbol::symbol() const{
-    string res;
-    for(auto i=map.begin(); true;){
-        res+=i->first.symbol();
-        if(i->second!=1) res+="^(" + to_string(i->second) + ")";
-        ++i;
-        if(i==map.end()) break;
-        res+="*";
-    }
+value::magnitude value::magnitude::pow(rational exp) const{
+    value::magnitude res=*this; 
+    transform(exponents.begin(), exponents.end(), res.exponents.begin(), [exp](rational n) { return n*exp; });
     return res;
 }
