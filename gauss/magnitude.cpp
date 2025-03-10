@@ -66,7 +66,7 @@ value::constant value::constant::protonMass(1.67262192595e-27);
 value::constant value::constant::neutronMass(1.67492750056e-27);
 value::constant value::constant::atomicMassConstant(1.66053906892e-27);
 
-value value::pi(constant::pi/magnitude::angle);
+value value::pi(constant::pi);
 value value::euler(constant::euler);
 value value::phi(constant::phi);
 value value::electronMass(constant::electronMass*magnitude::mass);
@@ -84,7 +84,7 @@ value value::stephanBoltzmannConstant((pi.square()/60)*pow(boltzmannConstant,4)/
 value value::atomicMassConstant(constant::atomicMassConstant*magnitude::mass);
 value value::vacuumPermeability(4*constant::pi*1e-7*magnitude::force/magnitude::current.square());
 value value::vacuumPermitivity((vacuumPermeability*pow(lightVelocity,2)).inverse());
-value value::coulombConstant((4*pi*vacuumPermitivity*magnitude::angle).inverse());
+value value::coulombConstant((4*pi*vacuumPermitivity).inverse());
 value value::bohrMagneton(elementaryCharge*planckBarConstant/(2*electronMass));
 value value::nuclearMagneton(elementaryCharge*planckBarConstant/(2*protonMass));
 value value::magneticFluxQuantum(planckConstant/(2*elementaryCharge));
@@ -137,4 +137,28 @@ value::magnitude value::magnitude::pow(rational exp) const{
     value::magnitude res=*this; 
     transform(exponents.begin(), exponents.end(), res.exponents.begin(), [exp](rational n) { return n*exp; });
     return res;
+}
+
+void value::magnitude::display(ostream &os) const{
+    bool any = false;
+    static std::string basicComponents[] = {"m", "kg", "s", "A", "K", "mol", "cd", "rad"};
+
+    os << " ";
+
+    for(size_t i=0; i<nBasicComponents; ++i){
+        if(exponents[i]!=0){
+            any = true;
+            os << basicComponents[i];
+            if(exponents[i]!=1) os << "^" << exponents[i];
+            os << " ";
+        }
+    }
+    if(!any) os << "units";
+}
+void value::display(std::ostream &os) const{
+    double real_value = scalar;
+    for(auto &i: constants) real_value*=pow((double)i.first, i.second);
+    
+    os << real_value;
+    measures.display(os);
 }

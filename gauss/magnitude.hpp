@@ -52,17 +52,13 @@ class value{
 
                 magnitude pow(rational exp) const;
 
-                inline void display(std::ostream &os) const{
-                    os << "[ ";
-                    for(size_t i=0; i<nBasicComponents; ++i) os << exponents[i] << " ";
-                    os << "]";
-                }
+                void display(std::ostream &os) const;
 
                 inline bool operator ==(const magnitude &m) const { return exponents==m.exponents; }
         };
         class constant{             // A data class
             private:
-                double value;
+                const double value;
         
                 inline constant() = delete;
                 
@@ -119,13 +115,7 @@ class value{
         inline value operator *(const magnitude &m) { return value(scalar, measures*m, constants); }
         inline value operator /(const magnitude &m) { return value(scalar, measures/m, constants); }
 
-        inline void display(std::ostream &os) const{
-            double real_value = scalar;
-            for(auto &i: constants) real_value*=pow((double)i.first, i.second);
-            
-            os << real_value << " ";
-            measures.display(os);
-        }
+        void display(std::ostream &os) const;
 
     public:
         static value pi, euler, phi;
