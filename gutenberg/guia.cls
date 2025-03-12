@@ -46,6 +46,7 @@
 }
 
 \newcommand{\firstPage}{
+    \author{DeepSeek}
     \maketitle
     \tableofcontents
     \setFirstPageStyle
