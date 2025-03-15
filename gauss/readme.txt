@@ -11,5 +11,5 @@ The names of classes (value, value::magnitude and value::constant) should be imp
     - The basic measuring units are defined as values (and not constants, this should be fixed).
 
 In addition, the use of the angle as a basic magnitude could be improved in the following ways:
-    - The constant 'pi' (3.14159...) should be include (either in positive or negative) the radian as a unit.
+    - The constant 'pi' (3.14159...) it should be include (either in positive or negative) the radian as a unit.
     - With that, it should be prevented for the rest of constants to include (or not) those radians.
