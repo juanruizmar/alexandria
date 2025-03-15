@@ -46,7 +46,7 @@
 }
 
 \newcommand{\firstPage}{
-    \author{DeepSeek}
+    \author{Some Chatbot}
     \maketitle
     \tableofcontents
     \setFirstPageStyle
