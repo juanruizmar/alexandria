@@ -19,8 +19,6 @@ class rational{   // A rational number, in exactly 32 bits
         }
 
         inline void reduce() { short div=std::gcd(std::abs(n),d); n/=div, d/=div; }
-        inline bool is_zero() const { return n==0; }
-        inline bool is_integer() const { return d==1; }
         
     public:
         inline rational(short _n=0, short _d=1): n(_d>0 ? _n : -_n), d(_d>0 ? _d : -_d){
@@ -69,6 +67,9 @@ class rational{   // A rational number, in exactly 32 bits
             if(is_integer()) return std::to_string(n);
             else return std::to_string(n) + "/" + std::to_string(d);
         }
+
+        inline bool is_zero() const { return n==0; }
+        inline bool is_integer() const { return d==1; }
 
         inline friend std::ostream &operator <<(std::ostream &os, rational q) { return os << q.to_string(); }
 };
