@@ -70,14 +70,14 @@ value value::pi(constant::pi);
 value value::euler(constant::euler);
 value value::phi(constant::phi);
 
-value value::metter(value::magnitude::distance);
-value value::kilogram(value::magnitude::mass);
-value value::second(value::magnitude::time);
-value value::ampere(value::magnitude::current);
-value value::kelvin(value::magnitude::temperature);
-value value::mole(value::magnitude::substanceAmount);
-value value::candela(value::magnitude::luminosity);
-value value::radian(value::magnitude::angle);
+value value::metter(magnitude::distance);
+value value::kilogram(magnitude::mass);
+value value::second(magnitude::time);
+value value::ampere(magnitude::current);
+value value::kelvin(magnitude::temperature);
+value value::mole(magnitude::substanceAmount);
+value value::candela(magnitude::luminosity);
+value value::radian(magnitude::angle);
 
 value value::newton(kilogram*metter/second.square());
 value value::joule(newton*metter);
@@ -115,6 +115,14 @@ value::magnitude value::magnitude::operator /(const value::magnitude &other) con
     value::magnitude res;
     transform(exponents.begin(), exponents.end(),  other.exponents.begin(), res.exponents.begin(), [](rational a, rational b) { return a-b; });
     return res;
+}
+
+value value::operator +(const value &other) const{
+    assert(measures==other.measures); 
+    double real_value = scalar, other_real_value = other.scalar;
+    for(auto &i: constants) real_value*=pow((double)i.first, i.second);
+    for(auto &i: other.constants) other_real_value*=pow((double)i.first, i.second);
+    return value(real_value+other_real_value, measures);
 }
 
 value::magnitude value::magnitude::square() const{

@@ -133,7 +133,6 @@ class value{
         static value electronMass, protonMass, neutronMass, bohrMagneton, nuclearMagneton;
         static value magneticFluxQuantum, rydbergConstant, josephsonConstant, comptonWaveLength;
 
-
         inline value operator *(const value &other) { return value(scalar*other.scalar, measures*other.measures, constants).add_constants(other.constants); }
         inline value operator /(const value &other) { return value(scalar/other.scalar, measures/other.measures, constants).sub_constants(other.constants); }
 
@@ -143,13 +142,7 @@ class value{
         inline friend value operator *(double k, const value &v) { return v.operator*(k); }
         inline friend value operator /(double k, const value &v) { return v.inverse().operator*(k); }
 
-        inline value operator +(const value &other) const{
-            assert(measures==other.measures); 
-            double real_value = scalar, other_real_value = other.scalar;
-            for(auto &i: constants) real_value*=pow((double)i.first, i.second);
-            for(auto &i: other.constants) other_real_value*=pow((double)i.first, i.second);
-            return value(real_value+other_real_value, measures);
-        }
+        value operator +(const value &other) const;
         
         inline value square() const { return pow(*this, 2); }
         inline value sq_root() const { return pow(*this, rational(1,2)); }
