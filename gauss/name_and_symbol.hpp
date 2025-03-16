@@ -26,6 +26,8 @@ class name_and_symbol{    // Easy to reuse. Something with a name and a symbol, 
                 virtual opperation_defined_name_and_symbol sq_root() const = 0;
                 virtual opperation_defined_name_and_symbol cube() const = 0;
                 virtual opperation_defined_name_and_symbol inverse() const = 0;
+
+                virtual opperation_defined_name_and_symbol pow(const rational&) const = 0;
         
                 virtual opperation_defined_name_and_symbol operator *(const name_and_symbol_wrapee_interface &other) const;
                 virtual opperation_defined_name_and_symbol operator /(const name_and_symbol_wrapee_interface &other) const;
@@ -51,6 +53,8 @@ class name_and_symbol{    // Easy to reuse. Something with a name and a symbol, 
                 opperation_defined_name_and_symbol sq_root() const;
                 opperation_defined_name_and_symbol cube() const;
                 opperation_defined_name_and_symbol inverse() const;
+
+                opperation_defined_name_and_symbol pow(const rational&) const;
         
                 inline bool operator ==(const user_defined_name_and_symbol &other) const { return name_==other.name_ && symbol_==other.symbol_; }
                 inline bool operator <(const user_defined_name_and_symbol &other) const { return name_==other.name_ ? name_<other.name_ : symbol_<other.symbol_; }
@@ -73,6 +77,8 @@ class name_and_symbol{    // Easy to reuse. Something with a name and a symbol, 
                 opperation_defined_name_and_symbol sq_root() const;
                 opperation_defined_name_and_symbol cube() const;
                 opperation_defined_name_and_symbol inverse() const;
+
+                opperation_defined_name_and_symbol pow(const rational&) const;
         
                 friend class name_and_symbol_wrapee_interface;
                 friend class user_defined_name_and_symbol;
@@ -95,6 +101,5 @@ class name_and_symbol{    // Easy to reuse. Something with a name and a symbol, 
         inline friend std::ostream &operator <<(std::ostream &os, const name_and_symbol &n) { return os << n.ns->name() << ", " << n.ns->symbol(); }
 
 };
-
 
 #endif

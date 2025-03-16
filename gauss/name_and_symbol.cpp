@@ -14,6 +14,9 @@ name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::user_define
 name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::user_defined_name_and_symbol::inverse() const{
     return map<user_defined_name_and_symbol, rational>{std::pair(*this, -1)};
 }
+name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::user_defined_name_and_symbol::pow(const rational &exp) const{
+    return map<user_defined_name_and_symbol, rational>{std::pair(*this, exp)};
+}
 
 name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::opperation_defined_name_and_symbol::square() const{
     opperation_defined_name_and_symbol res(*this);
@@ -35,6 +38,11 @@ name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::opperation_
     for(auto &i: res.map) i.second*=-1;
     return res;
 }
+name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::opperation_defined_name_and_symbol::pow(const rational &exp) const{
+    opperation_defined_name_and_symbol res(*this);
+    for(auto &i: res.map) i.second*=exp;
+    return res;
+}
 
 name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::name_and_symbol_wrapee_interface::operator *(const name_and_symbol_wrapee_interface &other) const{
     return opperation_defined_name_and_symbol(as_raw_map(), other.as_raw_map());
@@ -43,7 +51,7 @@ name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::name_and_sy
     return opperation_defined_name_and_symbol(as_raw_map(), other.inverse().as_raw_map());
 }
 name_and_symbol::opperation_defined_name_and_symbol::opperation_defined_name_and_symbol( const std::map<user_defined_name_and_symbol, rational> &m1,  const std::map<user_defined_name_and_symbol, rational> &m2){
-    for(const auto &i: m1) map.emplace(i.first, i.second + (m2.contains(i.first) ? m2.at(i.first) : 0) );
+    for(const auto &i: m1) map.emplace(i.first, i.second + (m2.contains(i.first) ? m2.at(i.first) : 0));
     for(const auto &i: m2) if(!m1.contains(i.first)) map.emplace(i.first, i.second + m1.at(i.first));
 }
 
