@@ -52,28 +52,34 @@ name_and_symbol::opperation_defined_name_and_symbol name_and_symbol::name_and_sy
 }
 name_and_symbol::opperation_defined_name_and_symbol::opperation_defined_name_and_symbol( const std::map<user_defined_name_and_symbol, rational> &m1,  const std::map<user_defined_name_and_symbol, rational> &m2){
     for(const auto &i: m1) map.emplace(i.first, i.second + (m2.contains(i.first) ? m2.at(i.first) : 0));
-    for(const auto &i: m2) if(!m1.contains(i.first)) map.emplace(i.first, i.second + m1.at(i.first));
+    for(const auto &i: m2) if(!map.contains(i.first)) map.emplace(i.first, i.second + (m1.contains(i.first) ? m1.at(i.first) : 0));
 }
 
 string name_and_symbol::opperation_defined_name_and_symbol::name() const{
     string res;
-    for(auto i=map.begin();;){
+    for(auto i=map.begin(); i!=map.end(); ++i){
         res+=i->first.name();
-        if(i->second!=1) res+="^(" + to_string(i->second) + ")";
-        ++i;
-        if(i==map.end()) break;
-        res+="*";
+
+        if(i->second.is_integer()){
+            if(i->second!=1) res+="^" + to_string(i->second);
+        }
+        else res+="^(" + to_string(i->second) + ")";
+
+        res += " ";
     }
     return res;
 }
 string name_and_symbol::opperation_defined_name_and_symbol::symbol() const{
     string res;
-    for(auto i=map.begin();;){
+    for(auto i=map.begin(); i!=map.end(); ++i){
         res+=i->first.symbol();
-        if(i->second!=1) res+="^(" + to_string(i->second) + ")";
-        ++i;
-        if(i==map.end()) break;
-        res+="*";
+
+        if(i->second.is_integer()){
+            if(i->second!=1) res+="^" + to_string(i->second);
+        }
+        else res+="^(" + to_string(i->second) + ")";
+        
+        res += " ";
     }
     return res;
 }

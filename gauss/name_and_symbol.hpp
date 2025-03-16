@@ -98,6 +98,11 @@ class name_and_symbol{    // Easy to reuse. Something with a name and a symbol, 
         inline std::string name() const { return ns->name(); }
         inline std::string symbol() const { return ns->symbol(); }
 
+        inline name_and_symbol pow(const rational &exp) const { return name_and_symbol(ns->pow(exp)); }
+
+        inline name_and_symbol operator *(const name_and_symbol &other) { return name_and_symbol((*ns)*(*(other.ns))); }
+        inline name_and_symbol operator /(const name_and_symbol &other) { return name_and_symbol((*ns)/(*(other.ns))); }
+
         inline friend std::ostream &operator <<(std::ostream &os, const name_and_symbol &n) { return os << n.ns->name() << ", " << n.ns->symbol(); }
 
 };
