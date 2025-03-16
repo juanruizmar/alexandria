@@ -154,7 +154,10 @@ void value::magnitude::display(ostream &os) const{
         if(exponents[i]!=0){
             any = true;
             os << basicComponents[i];
-            if(exponents[i]!=1) os << "^" << exponents[i];
+            if(exponents[i].is_integer()){
+                if(exponents[i]!=1) os << "^" << exponents[i];
+            }
+            else os << "^(" << exponents[i] << ")";
             os << " ";
         }
     }
