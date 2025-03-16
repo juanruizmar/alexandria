@@ -104,7 +104,6 @@ class name_and_symbol{    // Easy to reuse. Something with a name and a symbol, 
         inline name_and_symbol operator /(const name_and_symbol &other) { return name_and_symbol((*ns)/(*(other.ns))); }
 
         inline friend std::ostream &operator <<(std::ostream &os, const name_and_symbol &n) { return os << n.ns->name() << ", " << n.ns->symbol(); }
-
 };
 
 #endif
