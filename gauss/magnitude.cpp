@@ -69,37 +69,42 @@ value::constant value::constant::atomicMassConstant(1.66053906892e-27);
 value value::pi(constant::pi);
 value value::euler(constant::euler);
 value value::phi(constant::phi);
-value value::electronMass(constant::electronMass*magnitude::mass);
-value value::protonMass(constant::protonMass*magnitude::mass);
-value value::neutronMass(constant::neutronMass*magnitude::mass);
-value value::gravitationConstant(constant::gravitation*magnitude::force*magnitude::area/magnitude::mass.square());
-value value::lightVelocity(constant::lightVelocity*magnitude::velocity);
-value value::elementaryCharge(constant::elementaryCharge*magnitude::charge);
-value value::avogadroConstant(constant::avogadro/magnitude::substanceAmount);
-value value::boltzmannConstant(constant::boltzmann*magnitude::energy/magnitude::temperature);
+
+value value::metter(value::magnitude::distance);
+value value::kilogram(value::magnitude::mass);
+value value::second(value::magnitude::time);
+value value::ampere(value::magnitude::current);
+value value::kelvin(value::magnitude::temperature);
+value value::mole(value::magnitude::substanceAmount);
+value value::candela(value::magnitude::luminosity);
+value value::radian(value::magnitude::angle);
+
+value value::newton(kilogram*metter/second.square());
+value value::joule(newton*metter);
+value value::coulomb(ampere*second);
+
+value value::electronMass(constant::electronMass*kilogram);
+value value::protonMass(constant::protonMass*kilogram);
+value value::neutronMass(constant::neutronMass*kilogram);
+value value::gravitationConstant(constant::gravitation*newton*metter.square()/kilogram.square());
+value value::lightVelocity(constant::lightVelocity*metter/second);
+value value::elementaryCharge(constant::elementaryCharge*coulomb);
+value value::avogadroConstant(constant::avogadro/mole);
+value value::boltzmannConstant(constant::boltzmann*joule/kelvin);
 value value::molarGasConstant(boltzmannConstant*avogadroConstant);
-value value::planckConstant(constant::planck*magnitude::action);
+value value::planckConstant(constant::planck*joule*second);
 value value::planckBarConstant(planckConstant/(2*pi));
 value value::stephanBoltzmannConstant((pi.square()/60)*pow(boltzmannConstant,4)/(pow(planckBarConstant,3)*pow(lightVelocity,2)));
-value value::atomicMassConstant(constant::atomicMassConstant*magnitude::mass);
-value value::vacuumPermeability(4*constant::pi*1e-7*magnitude::force/magnitude::current.square());
+value value::atomicMassConstant(constant::atomicMassConstant*kilogram);
+value value::vacuumPermeability(4*constant::pi*1e-7*coulomb.square()/(newton*metter.square()));
 value value::vacuumPermitivity((vacuumPermeability*pow(lightVelocity,2)).inverse());
 value value::coulombConstant((4*pi*vacuumPermitivity).inverse());
 value value::bohrMagneton(elementaryCharge*planckBarConstant/(2*electronMass));
 value value::nuclearMagneton(elementaryCharge*planckBarConstant/(2*protonMass));
 value value::magneticFluxQuantum(planckConstant/(2*elementaryCharge));
-value value::rydbergConstant(constant::rydberg*magnitude::distance.inverse());
+value value::rydbergConstant(constant::rydberg*metter.inverse());
 value value::josephsonConstant(magneticFluxQuantum.inverse());
 value value::comptonWaveLength(planckConstant/(electronMass*lightVelocity));
-
-value value::metter(1*value::magnitude::distance);
-value value::kilogram(1*value::magnitude::mass);
-value value::second(1*value::magnitude::time);
-value value::ampere(1*value::magnitude::current);
-value value::kelvin(1*value::magnitude::temperature);
-value value::mole(1*value::magnitude::substanceAmount);
-value value::candela(1*value::magnitude::luminosity);
-value value::radian(1*value::magnitude::angle);
 
 value::magnitude value::magnitude::operator *(const value::magnitude &other) const{
     value::magnitude res;

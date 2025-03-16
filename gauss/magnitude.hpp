@@ -18,6 +18,7 @@
 #include <cassert>
 
 #include "rational.hpp"
+#include "name_and_symbol.hpp"
 
 class value{
     private:
@@ -101,6 +102,7 @@ class value{
         inline value &operator *=(const constant &k) { constants[k]+=1; return *this; }
         inline value &operator /=(const constant &k) { constants[k]/=1; return *this; }
 
+        inline value(const magnitude &m): value(1*m) {}
         inline value(const constant &k): value(1, magnitude::units, {{k,1}}) {}
         inline value(double v, const magnitude &m): scalar(v), measures(m) {}
         inline value(double v, const magnitude &m, const std::map<constant, rational> &kk): scalar(v), measures(m), constants(kk) {}
@@ -119,6 +121,10 @@ class value{
 
     public:
         static value pi, euler, phi;
+        
+        static value metter, kilogram, second, ampere, kelvin, mole, candela, radian;
+        static value newton, joule, coulomb;
+
         static value gravitationConstant, lightVelocity, elementaryCharge;
         static value avogadroConstant, boltzmannConstant;
         static value molarGasConstant, stephanBoltzmannConstant, atomicMassConstant;
@@ -127,7 +133,6 @@ class value{
         static value electronMass, protonMass, neutronMass, bohrMagneton, nuclearMagneton;
         static value magneticFluxQuantum, rydbergConstant, josephsonConstant, comptonWaveLength;
 
-        static value metter, kilogram, second, ampere, kelvin, mole, candela, radian;
 
         inline value operator *(const value &other) { return value(scalar*other.scalar, measures*other.measures, constants).add_constants(other.constants); }
         inline value operator /(const value &other) { return value(scalar/other.scalar, measures/other.measures, constants).sub_constants(other.constants); }
