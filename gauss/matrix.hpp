@@ -11,7 +11,7 @@
 
 #include <alexandria/data_build/rand_generator.hpp>
 
-template <typename T> class matrix_interface{
+template<typename T> class matrix_interface{
     public:
         virtual std::size_t n_rows() const = 0;
         virtual std::size_t n_cols() const = 0;
@@ -30,7 +30,7 @@ template <typename T> class matrix_interface{
         inline void display_size(std::ostream &os) const { os << n_rows() << " x " << n_cols() << std::endl; }
 };
 
-template <typename T> class matrix: public matrix_interface<T>{
+template<typename T> class matrix: public matrix_interface<T>{
     private:
         std::size_t n_cols_;
 
@@ -121,7 +121,32 @@ template <typename T> class matrix: public matrix_interface<T>{
             if(i>=n_rows() || j>=n_cols()) throw std::out_of_range("Index out of range");
             payload[i*n_cols()+j] = value;
         }
-        
+
+        friend matrix<T> operator*(const T &k, const matrix<T>& rhs){
+            matrix<T> res = rhs;
+            for(auto &i: res.payload) i*=k;
+            return res;
+        }
+        friend matrix<T> operator*(const matrix<T>& rhs, const T &k){
+            matrix<T> res = rhs;
+            for(auto &i: res.payload) i*=k;
+            return res;
+        }
+        friend matrix<T> operator/(const T &k, const matrix<T>& rhs){
+            matrix<T> res = rhs;
+            for(auto &i: res.payload){
+                if(i==0) throw std::invalid_argument("Division by zero is not allowed.");
+                i = k/i;
+            }
+            return res;
+        }
+        friend matrix<T> operator/(const matrix<T>& rhs, const T &k){
+            if(k==0) throw std::invalid_argument("Division by zero is not allowed.");
+            matrix<T> res = rhs;
+            for(auto &i: res.payload) i/=k;
+            return res;
+        }
+
         friend matrix<T> operator+(const matrix<T>& lhs, const matrix<T>& rhs){
             if(lhs.n_rows()!=rhs.n_rows() || lhs.n_cols()!=rhs.n_cols()) throw incorrect_matrix_size_add(lhs.n_rows(), lhs.n_cols(), rhs.n_rows(), rhs.n_cols());
             return lhs.add(rhs);
@@ -133,6 +158,12 @@ template <typename T> class matrix: public matrix_interface<T>{
         friend matrix<T> operator*(const matrix<T>& lhs, const matrix<T>& rhs){
             if(lhs.n_cols() != rhs.n_rows()) throw incorrect_matrix_size_mul(lhs.n_rows(), lhs.n_cols(), rhs.n_rows(), rhs.n_cols());
             return lhs.mul_naive(rhs);
+        }
+
+        static matrix<T> identity(std::size_t range){
+            matrix<T> res(range, range, 0);
+            for(std::size_t i=0; i<range; ++i) res.set(i,i,1);
+            return res;
         }
 };
 template<typename T> class sym_matrix: public matrix_interface<T>{
