@@ -3,6 +3,6 @@
 
 #include <string>
 
-std::string scientific_double_to_str(double value, int precision);
+std::string scientific_double_to_str(double value, int precision=4);
 
 #endif
