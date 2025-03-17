@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "io.h"
 
 const char* scientific_double_to_str(double value, int precision){
     int size = snprintf(NULL, 0, "%.*e", precision, value);
