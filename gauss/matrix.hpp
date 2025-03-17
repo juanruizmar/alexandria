@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include <fstream>
+#include <iostream>
 
 #include <alexandria/data_build/rand_generator.hpp>
 
