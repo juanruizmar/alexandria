@@ -18,7 +18,6 @@ template<typename T> class matrix_interface{
         virtual std::size_t n_cols() const = 0;
 
         virtual bool is_square() const = 0;
-        virtual bool is_null() const = 0;
 
         virtual const T& get(std::size_t i, std::size_t j) const = 0;
 
@@ -112,7 +111,6 @@ template<typename T> class matrix: public matrix_interface<T>{
         inline std::size_t n_cols() const { return n_cols_; }
 
         inline bool is_square() const { return n_rows() == n_cols(); }
-        inline bool is_null() const { return payload.size() == 0; }
 
         inline const T& get(std::size_t i, std::size_t j) const{
             if(i>=n_rows() || j>=n_cols()) throw std::out_of_range("Index out of range");
@@ -202,7 +200,6 @@ template<typename T> class sym_matrix: public matrix_interface<T>{
 
         inline bool is_square() const { return true; }
         inline bool is_symmetric() const { return true; }
-        inline bool is_null() const { return payload.is_null(); }
 
         inline const T& get(std::size_t i, std::size_t j) const{
             if(i>=n_rows() || j>=n_cols()) throw std::out_of_range("Index out of range");
