@@ -48,6 +48,13 @@
 \newcommand{\insertPicture}[1]{
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth, keepaspectratio]{#1}
+        \sbox0{\includegraphics{#1}}
+        \ifdim\wd0>\textwidth
+            \includegraphics[width=\textwidth, keepaspectratio]{#1}
+        \else\ifdim\ht0>\textheight
+            \includegraphics[height=0.9\textheight, keepaspectratio]{#1}
+        \else
+            \includegraphics{#1}
+        \fi\fi
     \end{figure}
 }
