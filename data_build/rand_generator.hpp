@@ -56,7 +56,7 @@ class rand_int_generator: public random_generator<std::size_t>{
 
 class chance_maker: private uniform_generator{
     public:
-        inline chance_maker(): uniform_generator(0,1) {}
+        inline chance_maker(){}
         bool chance(double prob) const;
 
         // A riffle. It returns a vector with the number of prizes that each participant got.

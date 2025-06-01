@@ -11,7 +11,9 @@
 
 #include <iostream>
 
-class histogram{
+#include "gnu_plots.hpp"
+
+class histogram: public gnuplot_graphic {
     private:
         double min_, max_;
         std::size_t total_;
@@ -48,6 +50,8 @@ class histogram{
         }
 
         void display(std::ostream &os);
+
+        std::string produce_gnuplot_datafile() const;
 };
 
 #endif
