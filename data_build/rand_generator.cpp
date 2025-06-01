@@ -2,6 +2,7 @@
 #include "rand_generator.hpp"
 
 #include <iostream>
+#include <sstream>
 
 #include <cassert>
 
@@ -52,4 +53,13 @@ std::vector<size_t> chance_maker::deliver_prizes(size_t n_prizes, std::vector<do
     }
 
     return res;
+}
+
+std::string uuid_generator::get() const{
+    char c_string[37];
+    c_string[36] = '\0';
+
+    snprintf(c_string, 36, "%08lx%08lx%08lx%08lx", generator.get(), generator.get(), generator.get(), generator.get());
+
+    return string(c_string);
 }

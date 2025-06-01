@@ -75,4 +75,16 @@ class rand_perm_generator{
         inline void set_numbering_from_one(bool number_from_one_instead_of_zero) { number_from_one_instead_of_zero_=number_from_one_instead_of_zero; } 
 };
 
+class uuid_generator: private random_generator<std::string>{
+    private:
+        rand_int_generator generator;
+
+    public:
+        uuid_generator(std::size_t seed) = delete;
+
+        inline uuid_generator(): random_generator<std::string>(std::random_device{}()) {}
+
+        std::string get() const;
+};
+
 #endif
