@@ -28,16 +28,3 @@ histogram::histogram(std::ifstream &is) {
     frequencies_.resize(json_data["frequencies"].size());
     for (size_t i = 0; i < frequencies_.size(); ++i) frequencies_[i] = json_data["frequencies"][i];
 }
-
-std::string histogram::produce_gnuplot_datafile() const {
-    std::string filename = "__" + get_id() + ".dat";
-    std::ofstream file(filename);
-
-    if (!file.is_open()) throw std::runtime_error("Failed to open file for writing: " + filename);
-    
-    for(const auto & freq : frequencies_) file << freq << "\n";
-
-    file.close();
-
-    return filename;
-}

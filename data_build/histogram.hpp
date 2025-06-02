@@ -50,8 +50,8 @@ class histogram: public gnuplot_graphic {
         }
 
         void display(std::ostream &os);
-
-        std::string produce_gnuplot_datafile() const;
+        
+        inline void print_gnuplot_datafile(std::ostream &os) const { for(const auto & freq : frequencies_) os << freq << "\n"; }
 };
 
 #endif
