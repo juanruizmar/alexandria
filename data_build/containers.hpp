@@ -239,6 +239,18 @@ template<typename T> class list_container: public iterable_container<T>{        
 
                 friend class list_container<T>;
         };
+        
+        inline void insert_front(const T &something) { underlying.push_front(something); }
+        inline void insert_back(const T &something) { underlying.push_back(something); }
+
+        inline void extract_front() { underlying.pop_front(); }
+        inline void extract_back() { underlying.pop_back(); }
+
+        inline const T &read_front() const { return underlying.front(); }
+        inline T read_front() { return underlying.front(); }
+        
+        inline const T &read_back() const { return underlying.back(); }
+        inline T read_back() { return underlying.back(); }
 
         inline bool is_empty() const { return underlying.empty(); }
         inline std::size_t size() const { return underlying.size(); }
